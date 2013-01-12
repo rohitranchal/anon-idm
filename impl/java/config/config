@@ -1,0 +1,13 @@
+keystore_name=idp.jks
+keystore_type=JKS
+keystore_password=idpstore
+private_key_alias=idp
+private_key_password=idpstore
+
+db_user=root
+db_password=
+db_name=idp
+db_host=localhost
+
+
+

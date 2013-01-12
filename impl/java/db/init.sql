@@ -1,0 +1,33 @@
+CREATE TABLE Claim_Definition (
+	Name VARCHAR(512) NOT NULL PRIMARY KEY,
+	Description VARCHAR(2048),
+	PrivateKey TEXT NOT NULL,
+	PublicParams TEXT NOT NULL,
+	Digest TEXT NOT NULL,
+	Sig TEXT NOT NULL,
+	DateCreated TIMESTAMP NOT NULL	
+);
+
+CREATE TABLE Claim_Definition_Re_Key (
+	ID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	Name VARCHAR(512) NOT NULL,
+	ReKeyInfo TEXT NOT NULL
+);
+
+DROP TABLE User;
+CREATE TABLE User (
+	Name VARCHAR(256) NOT NULL PRIMARY KEY,
+	PubKeyCertificateFpr VARCHAR(256) NOT NULL, 
+	PubKeyCertificate TEXT NOT NULL
+);
+
+CREATE TABLE Claim (
+	ClaimName VARCHAR(512) NOT NULL,
+	UserName VARCHAR(256) NOT NULL,
+	UserIDComponent TEXT NOT NULL,
+	UserOKComponent TEXT NOT NULL,
+	IssueDate TIMESTAMP NOT NULL,
+	PRIMARY KEY(ClaimName, UserName)
+);
+
+
