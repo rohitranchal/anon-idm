@@ -43,6 +43,7 @@ public class IdentityClaimDefinition {
 	 */
 	private String b64Sig;
 	
+	
 	public IdentityClaimDefinition(String name, AEParameters params) {
 		this.name = name;
 		this.params = params;

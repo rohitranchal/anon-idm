@@ -2,6 +2,7 @@ package org.ruchith.research.idm.idp.db;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 
 import org.ruchith.research.idm.IdentityClaimDefinition;
 
@@ -58,4 +59,13 @@ public class Database {
 		con.createStatement().execute(sql);
 	}
 
+	/**
+	 * Return all claim definitions.
+	 * 
+	 * @return
+	 */
+	public ResultSet getAllClaimDefinitions() throws Exception {
+		String sql = "SELECT * FROM Claim_Definition";
+		return con.createStatement().executeQuery(sql);
+	}
 }
