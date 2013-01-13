@@ -1,4 +1,16 @@
 h1=title
- 
-for entry in entries
-	p='Claim: ' + entry.Name
+
+table
+	tr
+		th='Name'
+		th='Description'
+		th='Date Created'
+		th='Details'
+
+	for entry in entries
+		tr
+			td=entry.Name
+			td=entry.Description
+			td=entry.DateCreated
+			td
+				a(href='/claim/' + entry.Name)='Details'

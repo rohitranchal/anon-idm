@@ -6,7 +6,13 @@ var db = require('../db');
 
 exports.index = function(req, res){
 	db.getAllClaimDefs(function(val){
-		res.render('index', { title: 'All Claims', entries : val  });		
+		res.render('index', { title: 'All Claims', entries : val  });
 	});
   
+};
+
+exports.claim = function(req,res) {
+	db.getClaimDetails(req.params.id, function(val) {
+		res.render('claim', { claim : val  });
+	});
 };

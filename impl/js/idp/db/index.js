@@ -13,8 +13,16 @@ exports.getAllClaimDefs = function(cb) {
 	connection.query('SELECT * FROM Claim_Definition', function(err, rows, fields) {
 	  if (err) throw err;
 	  cb(rows);
-
 	});
 	
 }
 
+
+exports.getClaimDetails = function(name, cb) {
+
+	connection.query("SELECT * FROM Claim_Definition WHERE Name='" + name + "'", function(err, rows, fields) {
+		if (err) throw err;
+		cb(rows[0]);
+	});
+
+}
