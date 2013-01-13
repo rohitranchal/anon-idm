@@ -6,6 +6,7 @@ table
 		th='Description'
 		th='Date Created'
 		th='Details'
+		th='Raw'
 
 	for entry in entries
 		tr
@@ -14,3 +15,5 @@ table
 			td=entry.DateCreated
 			td
 				a(href='/claim/' + entry.Name)='Details'
+			td
+				a(href='/claimdef/' + entry.Name)='Raw'

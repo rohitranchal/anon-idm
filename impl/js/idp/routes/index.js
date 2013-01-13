@@ -16,3 +16,10 @@ exports.claim = function(req,res) {
 		res.render('claim', { claim : val  });
 	});
 };
+
+exports.claimDef = function(req,res) {
+	db.getClaimDetails(req.params.id, function(val) {
+		res.send(val);
+	});
+};
+
