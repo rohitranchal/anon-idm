@@ -10,7 +10,7 @@ connection.connect();
 
 exports.getAllClaimDefs = function(cb) {
 	
-	connection.query('SELECT * FROM Claim_Definition', function(err, rows, fields) {
+	connection.query('SELECT  Name, Description, PublicParams, Digest, Sig, DateCreated  FROM Claim_Definition', function(err, rows, fields) {
 	  if (err) throw err;
 	  cb(rows);
 	});

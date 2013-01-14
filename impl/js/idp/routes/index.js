@@ -11,6 +11,13 @@ exports.index = function(req, res){
   
 };
 
+exports.claims = function(req, res){
+	db.getAllClaimDefs(function(val){
+		res.send(val);
+	});
+  
+};
+
 exports.claim = function(req,res) {
 	db.getClaimDetails(req.params.id, function(val) {
 		res.render('claim', { claim : val  });

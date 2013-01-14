@@ -28,6 +28,7 @@ app.configure('development', function(){
 });
 
 app.get('/', routes.index);
+app.get('/claims/', routes.claims);
 app.get('/claim/:id', routes.claim);
 app.get('/claimdef/:id', routes.claimDef);
 app.get('/users', user.list);
