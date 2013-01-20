@@ -18,7 +18,8 @@ DROP TABLE User;
 CREATE TABLE User (
 	Name VARCHAR(256) NOT NULL PRIMARY KEY,
 	PubKeyCertificateFpr VARCHAR(256) NOT NULL, 
-	PubKeyCertificate TEXT NOT NULL
+	PubKeyCertificate TEXT NOT NULL,
+	DateCreated TIMESTAMP NOT NULL
 );
 
 CREATE TABLE Claim (

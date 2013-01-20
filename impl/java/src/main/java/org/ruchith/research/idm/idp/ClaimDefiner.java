@@ -2,6 +2,8 @@ package org.ruchith.research.idm.idp;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Tool to define identity claims.
@@ -30,5 +32,10 @@ public class ClaimDefiner {
 		manager.generateNewClaimDefinition(claimName, claimDesc);
 
 		System.out.println("Claim definition added successfully!");
+		System.out.println("List of available claims:");
+		List<String> claims = manager.getAllClaimNames();
+		for (Iterator<String> iterator = claims.iterator(); iterator.hasNext();) {
+			System.out.println((String) iterator.next());
+		}
 	}
 }

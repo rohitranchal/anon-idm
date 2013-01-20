@@ -9,6 +9,7 @@ import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.Signature;
+import java.security.cert.Certificate;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
@@ -117,9 +118,39 @@ public class IdentityManager {
 		return claims;
 	}
 
-	public IdentityClaim issueClaim(String name, String user, Element userInput) {
+	/**
+	 * Issue an identity claim to the given user.
+	 * @param name
+	 * @param user
+	 * @param userInput
+	 * @return
+	 * @throws Exception
+	 */
+	public IdentityClaim issueClaim(String name, String user, Element userInput)
+			throws Exception {
 		// TODO
 		return new IdentityClaim();
+	}
+
+	/**
+	 * Add a user entry with the given information.
+	 * 
+	 * @param name User name.
+	 * @param cert User certificate.
+	 */
+	public void addUser(String name, Certificate cert) {
+		// Create the user entry in the db
+	}
+
+	/**
+	 * Look up the certificate for the given certificate fingerprint and return.
+	 * 
+	 * @param certFpr
+	 *            Certificate fingerprint.
+	 * @return Certificate if exists, otherwise null.
+	 */
+	public Certificate getUserCertificate(String certFpr) {
+		throw new UnsupportedOperationException("TODO");
 	}
 
 }
