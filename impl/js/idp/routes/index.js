@@ -1,4 +1,5 @@
 var db = require('../db');
+fs = require('fs');
 
 /*
  * GET home page.
@@ -30,3 +31,11 @@ exports.claimDef = function(req,res) {
 	});
 };
 
+exports.cert = function(req,res) {
+	fs.readFile('/home/ruchith/.idp/cert', 'utf8', function (err,data) {
+		if (err) {
+			return console.log(err);
+		}
+		res.send(data);
+	});
+};
