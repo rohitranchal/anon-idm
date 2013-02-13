@@ -3,10 +3,11 @@ package org.ruchith.research.idm;
 import it.unisa.dia.gas.jpbc.Element;
 
 import org.ruchith.ae.base.AEParameters;
+
 /**
  * 
  * @author Ruchith Fernando
- *
+ * 
  */
 public class IdentityClaimDefinition {
 
@@ -14,41 +15,39 @@ public class IdentityClaimDefinition {
 	 * Name of the claim
 	 */
 	private String name;
-	
+
 	/**
 	 * Name of the claim
 	 */
 	private String description;
-	
+
 	/**
 	 * Public Parameters of the claim
 	 */
 	private AEParameters params;
-	
+
 	/**
-	 * Master key associated with this claim.
-	 * This is used in issuing new claim instances.
+	 * Master key associated with this claim. This is used in issuing new claim
+	 * instances.
 	 */
 	private Element masterKey;
-	
+
 	/**
-	 * SHA 512 digest of the claim definition.
-	 * SHA512(name||params)
+	 * SHA 512 digest of the claim definition. SHA512(name||params)
 	 */
 	private String b64Hash;
-	
+
 	/**
 	 * Identity provider's signature on the SHA512 digest.
 	 * Sig(SHA512(name||params))
 	 */
 	private String b64Sig;
-	
-	
+
 	public IdentityClaimDefinition(String name, AEParameters params) {
 		this.name = name;
 		this.params = params;
 	}
-	
+
 	public IdentityClaimDefinition(String name, AEParameters params, Element mk) {
 		this.name = name;
 		this.params = params;
@@ -91,6 +90,8 @@ public class IdentityClaimDefinition {
 		this.b64Sig = b64Sig;
 	}
 
-	
-	
+	public String getDgstContet() {
+		return this.getName() + this.getParams().serializeJSON();
+	}
+
 }

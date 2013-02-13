@@ -77,18 +77,18 @@ public class IdentityManager {
 			claimDef.setDescription(desc);
 		}
 
+		byte[] contentBytes = claimDef.getDgstContet().getBytes();
+
 		// Create digest
 		MessageDigest dgst = MessageDigest.getInstance("SHA-512");
-		String claimDefToDgst = claimDef.getName()
-				+ claimDef.getParams().serializeJSON();
-		dgst.update(claimDefToDgst.getBytes());
+		dgst.update(contentBytes);
 		byte[] sha512Dgst = dgst.digest();
 		claimDef.setB64Hash(new String(Base64.encode(sha512Dgst)));
 
 		// Sign claim definition
 		Signature sig = Signature.getInstance("SHA512withRSA");
 		sig.initSign(this.privKey);
-		sig.update(claimDefToDgst.getBytes());
+		sig.update(contentBytes);
 		byte[] sigBytes = sig.sign();
 		claimDef.setB64Sig(new String(Base64.encode(sigBytes)));
 
