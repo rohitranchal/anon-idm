@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 
+import org.bouncycastle.util.encoders.Base64;
+import org.codehaus.jackson.node.ObjectNode;
 import org.ruchith.research.idm.IdentityClaimDefinition;
 
 /**
@@ -49,10 +51,12 @@ public class Database {
 	 */
 	public void storeClaimDefinition(IdentityClaimDefinition claimDef)
 			throws Exception {
+		ObjectNode json = claimDef.getParams().serializeJSON();
+		byte[] paramsJsonBytes = json.toString().getBytes();
 		String sql = "INSERT INTO Claim_Definition VALUES('"
 				+ claimDef.getName() + "','" + claimDef.getDescription()
 				+ "','" + claimDef.getMasterKey().toString() + "','"
-				+ claimDef.getParams().serializeJSON() + "','"
+				+ new String(Base64.encode(paramsJsonBytes)) + "','"
 				+ claimDef.getB64Hash() + "','" + claimDef.getB64Sig() + "',"
 				+ "NOW())";
 		
