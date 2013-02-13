@@ -1,7 +1,7 @@
 package org.ruchith.research.idm.idp;
 
 /**
- * This sets up the configuration directory and other files
+ * This sets up the configuration directory and other files.
  * 
  * @author Ruchith Fernando
  *
