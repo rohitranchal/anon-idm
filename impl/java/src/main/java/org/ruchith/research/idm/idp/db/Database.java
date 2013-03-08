@@ -72,4 +72,11 @@ public class Database {
 		String sql = "SELECT * FROM Claim_Definition";
 		return con.createStatement().executeQuery(sql);
 	}
+	
+	public void addUserEntry(String user, String certFpr, String cert) throws Exception {
+		String sql = "INSERT INTO User(Name, " +
+				"PubKeyCertificateFpr, PubKeyCertificate) VALUES" +
+				"('" + user + "','" + certFpr + "','" + cert + "')";
+		con.createStatement().execute(sql);
+	}
 }

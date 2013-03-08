@@ -10,6 +10,7 @@ import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.Signature;
 import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,7 @@ import org.ruchith.ae.base.AEParameters;
 import org.ruchith.ae.base.RootKeyGen;
 import org.ruchith.research.idm.IdentityClaim;
 import org.ruchith.research.idm.IdentityClaimDefinition;
+import org.ruchith.research.idm.Util;
 import org.ruchith.research.idm.idp.db.Database;
 
 public class IdentityManager {
@@ -138,8 +140,14 @@ public class IdentityManager {
 	 * @param name User name.
 	 * @param cert User certificate.
 	 */
-	public void addUser(String name, Certificate cert) {
+	public void addUser(String name, Certificate cert) throws Exception {
 		// Create the user entry in the db
+		byte[] certBytes = cert.getEncoded();
+		MessageDigest md = MessageDigest.getInstance("SHA-1");
+		md.update(certBytes);
+		String fpr = Util.converToHexString(md.digest()).trim();
+		String certVal = new String(Base64.encode(certBytes));
+		this.db.addUserEntry(name, fpr, certVal);
 	}
 
 	/**

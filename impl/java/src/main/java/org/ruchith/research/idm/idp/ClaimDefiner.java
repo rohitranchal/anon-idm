@@ -21,6 +21,7 @@ public class ClaimDefiner {
 
 		if (claimName == null || claimName.trim().length() == 0) {
 			System.out.println("Claim name cannot be empty!");
+			System.exit(0);
 		}
 
 		System.out.println("Claim description (Optional):");
