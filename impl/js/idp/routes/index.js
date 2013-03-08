@@ -32,7 +32,7 @@ exports.claimDef = function(req,res) {
 };
 
 exports.cert = function(req,res) {
-	fs.readFile('/home/ruchith/.idp/cert', 'utf8', function (err,data) {
+	fs.readFile('/Users/ruchith/.idp/cert', 'utf8', function (err,data) {
 		if (err) {
 			return console.log(err);
 		}

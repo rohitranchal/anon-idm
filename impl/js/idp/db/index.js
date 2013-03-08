@@ -2,7 +2,7 @@ var mysql      = require('mysql');
 var connection = mysql.createConnection({
 	host     : 'localhost',
 	user     : 'root',
-	password : 'testing',
+	password : '',
 	database : 'idp',
 	multipleStatements: true
 });
@@ -23,6 +23,15 @@ exports.getClaimDetails = function(name, cb) {
 	connection.query("SELECT Name, Description, PublicParams, Digest, Sig, DateCreated FROM Claim_Definition WHERE Name='" + name + "'", function(err, rows, fields) {
 		if (err) throw err;
 		cb(rows[0]);
+	});
+
+}
+
+exports.getUserDetails = function(cb) {
+
+	connection.query("SELECT * FROM User", function(err, rows, fields) {
+		if (err) throw err;
+		cb(rows);
 	});
 
 }
