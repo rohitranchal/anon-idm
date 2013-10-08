@@ -10,7 +10,6 @@ import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.Signature;
 import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,13 +39,10 @@ public class IdentityManager {
 
 		// Read the keystore and get the private key
 		KeyStore ks = KeyStore.getInstance(config.getKeystoreType());
-		ks.load(new FileInputStream(config.getKeystoreFilePath()), config
-				.getKeystorePassword().toCharArray());
-		this.privKey = (PrivateKey) ks.getKey(config.getPrivKeyAlias(), config
-				.getPrivKeyPassword().toCharArray());
+		ks.load(new FileInputStream(config.getKeystoreFilePath()), config.getKeystorePassword().toCharArray());
+		this.privKey = (PrivateKey) ks.getKey(config.getPrivKeyAlias(), config.getPrivKeyPassword().toCharArray());
 
-		this.db = Database.getInstance(this.config.getDbHost(),
-				this.config.getDbUser(), this.config.getDbPassword());
+		this.db = Database.getInstance(this.config.getDbHost(), this.config.getDbUser(), this.config.getDbPassword());
 
 	}
 
@@ -60,10 +56,8 @@ public class IdentityManager {
 	 * @return An instance of {@link IdentityClaimDefinition} which holds the
 	 *         public parameters and the master key.
 	 */
-	public IdentityClaimDefinition generateNewClaimDefinition(String name,
-			String desc) throws Exception {
-		CurveParams curveParams = (CurveParams) new TypeA1CurveGenerator(4, 32)
-				.generate();
+	public IdentityClaimDefinition generateNewClaimDefinition(String name, String desc) throws Exception {
+		CurveParams curveParams = (CurveParams) new TypeA1CurveGenerator(4, 32).generate();
 		AEParameterGenerator paramGen = new AEParameterGenerator();
 		paramGen.init(curveParams);
 		AEParameters params = paramGen.generateParameters();
@@ -72,8 +66,7 @@ public class IdentityManager {
 		rkg.init(params);
 		Element mk = paramGen.getMasterKey();
 
-		IdentityClaimDefinition claimDef = new IdentityClaimDefinition(name,
-				params, mk);
+		IdentityClaimDefinition claimDef = new IdentityClaimDefinition(name, params, mk);
 
 		if (desc != null) {
 			claimDef.setDescription(desc);
@@ -122,14 +115,14 @@ public class IdentityManager {
 
 	/**
 	 * Issue an identity claim to the given user.
+	 * 
 	 * @param name
 	 * @param user
 	 * @param userInput
 	 * @return
 	 * @throws Exception
 	 */
-	public IdentityClaim issueClaim(String name, String user, Element userInput)
-			throws Exception {
+	public IdentityClaim issueClaim(String name, String user, Element userInput) throws Exception {
 		// TODO
 		return new IdentityClaim();
 	}
@@ -137,8 +130,10 @@ public class IdentityManager {
 	/**
 	 * Add a user entry with the given information.
 	 * 
-	 * @param name User name.
-	 * @param cert User certificate.
+	 * @param name
+	 *            User name.
+	 * @param cert
+	 *            User certificate.
 	 */
 	public void addUser(String name, Certificate cert) throws Exception {
 		// Create the user entry in the db
