@@ -8,16 +8,44 @@
 	<name>idp</name>
 	<url>http://maven.apache.org</url>
 	<build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.5</source>
+					<target>1.5</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.8</version>
+				<executions>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/lib</outputDirectory>
+							<overWriteReleases>false</overWriteReleases>
+							<overWriteSnapshots>false</overWriteSnapshots>
+							<overWriteIfNewer>true</overWriteIfNewer>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<repositories>
+		<repository>
+			<id>mvn-repo</id>
+			<url>http://anon-idm.googlecode.com/svn/trunk/maven_repo/</url>
+		</repository>
+	</repositories>
+
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -29,85 +57,66 @@
 			<groupId>org.ruchith.ae</groupId>
 			<artifactId>base</artifactId>
 			<version>0.1</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/base.jar</systemPath>
 		</dependency>
 		<dependency>
-		    <groupId>org.ruchith.idm.lib</groupId>
-		    <artifactId>a</artifactId>
-		    <version>0.1</version>
-		    <scope>system</scope>
-			<systemPath>${project.basedir}/lib/bcprov-jdk16-146.jar</systemPath>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk16</artifactId>
+			<version>1.46</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.ruchith.idm.lib</groupId>
-		    <artifactId>b</artifactId>
-		    <version>0.1</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/jackson-core-asl-1.9.4.jar</systemPath>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-core-asl</artifactId>
+			<version>1.9.4</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.ruchith.idm.lib</groupId>
-		    <artifactId>c</artifactId>
-		    <version>0.1</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/jackson-mapper-asl-1.9.4.jar</systemPath>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-mapper-asl</artifactId>
+			<version>1.9.4</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.ruchith.idm.lib</groupId>
-		    <artifactId>d</artifactId>
-		    <version>0.1</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/jackson-xc-1.9.4.jar</systemPath>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-xc</artifactId>
+			<version>1.9.4</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.ruchith.idm.lib</groupId>
-		    <artifactId>e</artifactId>
-		    <version>0.1</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/jackson-jaxrs-1.9.4.jar</systemPath>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-jaxrs</artifactId>
+			<version>1.9.4</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.ruchith.idm.lib</groupId>
-		    <artifactId>f</artifactId>
-		    <version>0.1</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/jackson-mrbean-1.9.4.jar</systemPath>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-mrbean</artifactId>
+			<version>1.9.4</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.ruchith.idm.lib</groupId>
-		    <artifactId>g</artifactId>
-		    <version>0.1</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/jpbc-api-1.1.0.jar</systemPath>
+			<groupId>it.unisa.dia.gas.jpbc</groupId>
+			<artifactId>jpbc-api</artifactId>
+			<version>1.1.0</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.ruchith.idm.lib</groupId>
-		    <artifactId>h</artifactId>
-		    <version>0.1</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/jpbc-crypto-1.1.0.jar</systemPath>
+			<groupId>it.unisa.dia.gas.jpbc</groupId>
+			<artifactId>jpbc-crypto</artifactId>
+			<version>1.1.0</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.ruchith.idm.lib</groupId>
-		    <artifactId>i</artifactId>
-		    <version>0.1</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/jpbc-pbc-1.1.0.jar</systemPath>
+			<groupId>it.unisa.dia.gas.jpbc</groupId>
+			<artifactId>jpbc-crypto</artifactId>
+			<version>1.1.0</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.ruchith.idm.lib</groupId>
-		    <artifactId>j</artifactId>
-		    <version>0.1</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/jpbc-plaf-1.1.0.jar</systemPath>
+			<groupId>it.unisa.dia.gas.jpbc</groupId>
+			<artifactId>jpbc-pbc</artifactId>
+			<version>1.1.0</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.ruchith.idm.lib</groupId>
-		    <artifactId>k</artifactId>
-		    <version>0.1</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/mysql-connector-java-5.1.22-bin.jar</systemPath>
+			<groupId>it.unisa.dia.gas.jpbc</groupId>
+			<artifactId>jpbc-plaf</artifactId>
+			<version>1.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.22</version>
 		</dependency>
 	</dependencies>
 </project>
