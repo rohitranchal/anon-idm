@@ -1,1 +1,0 @@
-java -cp ../lib/idp-1.0-SNAPSHOT.jar:../lib/mysql-connector-java-5.1.22-bin.jar:../lib/* org.ruchith.research.idm.idp.UserManager 1 
