@@ -40,6 +40,8 @@ app.get('/useradd_show', routes.useradd_show);
 app.post('/useradd_process', routes.useradd_process);
 app.get('/users', routes.users);
 
+app.get('/admin', routes.admin_show);
+
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));

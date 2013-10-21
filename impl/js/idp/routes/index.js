@@ -75,6 +75,10 @@ exports.users = function(req,res) {
 };
 
 
+exports.admin_show = function(req, res) {
+	res.render('admin');
+}
+
 exports.cert = function(req,res) {
 	fs.readFile('/Users/ruchith/.idp/cert', 'utf8', function (err,data) {
 		if (err) {
