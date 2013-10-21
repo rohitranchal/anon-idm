@@ -31,7 +31,9 @@ app.get('/', routes.index);
 app.get('/claims/', routes.claims);
 app.get('/cert/', routes.cert);
 app.get('/claim/:id', routes.claim);
-app.get('/claimdef/:id', routes.claimDef);
+app.get('/claimdef_show', routes.claimdef_show);
+app.post('/claimdef_process', routes.claimdef_process);
+app.get('/claimdef/:id', routes.claimdef);
 app.get('/users', user.list);
 
 http.createServer(app).listen(app.get('port'), function(){
