@@ -1,0 +1,13 @@
+h1 List of Users
+
+table
+	tr
+		th='Name'
+		th='Certificate Fingerprint'
+		th='Date Created'
+
+	for user in user_list
+		tr
+			td=user.Name
+			td=user.PubKeyCertificateFpr
+			td=user.DateCreated

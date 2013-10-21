@@ -5,7 +5,6 @@
 
 var express = require('express')
   , routes = require('./routes')
-  , user = require('./routes/user')
   , http = require('http')
   , path = require('path');
 
@@ -28,13 +27,19 @@ app.configure('development', function(){
 });
 
 app.get('/', routes.index);
-app.get('/claims/', routes.claims);
 app.get('/cert/', routes.cert);
-app.get('/claim/:id', routes.claim);
+
 app.get('/claimdef_show', routes.claimdef_show);
 app.post('/claimdef_process', routes.claimdef_process);
+app.get('/claims/', routes.claims);
+app.get('/claim/:id', routes.claim);
 app.get('/claimdef/:id', routes.claimdef);
-app.get('/users', user.list);
+
+
+app.get('/useradd_show', routes.useradd_show);
+app.post('/useradd_process', routes.useradd_process);
+app.get('/users', routes.users);
+
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));

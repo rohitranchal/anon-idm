@@ -57,8 +57,23 @@ exports.claimdef_show = function(req,res) {
 
 exports.claimdef_process = function(req,res) {
 	idm.generateNewClaimDefinition(req.body.name, req.body.description);
-	res.send('OK');
+	res.redirect('/');
 };
+
+
+exports.useradd_show = function(req,res) {
+	res.render('useradd');
+};
+exports.useradd_process = function(req,res) {
+	idm.addUser(req.body.name, req.body.cert);
+	res.redirect('/');	
+};
+exports.users = function(req,res) {
+	db.getUserDetails(function(val) {
+		res.render('users', { user_list : val  });
+	});	
+};
+
 
 exports.cert = function(req,res) {
 	fs.readFile('/Users/ruchith/.idp/cert', 'utf8', function (err,data) {
