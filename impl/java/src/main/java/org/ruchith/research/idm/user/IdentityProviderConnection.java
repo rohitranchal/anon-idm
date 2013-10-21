@@ -46,4 +46,5 @@ public interface IdentityProviderConnection {
 	public IdentityClaim requestClaim(IdentityClaimDefinition claim,
 			PrivateKey privKey, Element masterKey);
 
+	
 }

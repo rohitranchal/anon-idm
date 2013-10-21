@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Properties;
 
+import org.bouncycastle.util.encoders.Base64;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ArrayNode;
@@ -27,7 +28,6 @@ import org.ruchith.ae.base.AEParameters;
 import org.ruchith.research.idm.IdentityClaim;
 import org.ruchith.research.idm.IdentityClaimDefinition;
 
-import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 
 /**
  * 
@@ -40,7 +40,6 @@ public class BasicIdentityProviderConnection implements
 	private Certificate idpCert;
 	private ArrayList<IdentityClaimDefinition> claims = new ArrayList<IdentityClaimDefinition>();
 
-	@Override
 	public boolean connect(Properties configuration) {
 
 		String claimsUrl = configuration.getProperty("claims_url");
@@ -130,17 +129,15 @@ public class BasicIdentityProviderConnection implements
 		return sb.toString();
 	}
 
-	@Override
 	public Collection<IdentityClaimDefinition> getAllClaimDefinitions() {
-		// TODO Auto-generated method stub
 		return this.claims;
 	}
 
-	@Override
-	public IdentityClaim requestClaim(IdentityClaimDefinition claim,
-			PrivateKey privKey, Element masterKey) {
+	public IdentityClaim requestClaim(IdentityClaimDefinition claim, PrivateKey privKey, Element masterKey) {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+
 
 }

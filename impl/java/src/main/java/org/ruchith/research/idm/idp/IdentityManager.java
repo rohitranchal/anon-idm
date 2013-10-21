@@ -10,6 +10,7 @@ import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.Signature;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
@@ -135,14 +136,14 @@ public class IdentityManager {
 	 * @param cert
 	 *            User certificate.
 	 */
-	public void addUser(String name, Certificate cert) throws Exception {
-		// Create the user entry in the db
-		byte[] certBytes = cert.getEncoded();
+	public void addUser(String name, String b64Cert) throws Exception {
+		
 		MessageDigest md = MessageDigest.getInstance("SHA-1");
-		md.update(certBytes);
+		md.update(Base64.decode(b64Cert));
 		String fpr = Util.converToHexString(md.digest()).trim();
-		String certVal = new String(Base64.encode(certBytes));
-		this.db.addUserEntry(name, fpr, certVal);
+		
+		// Create the user entry in the db
+		this.db.addUserEntry(name, fpr, b64Cert);
 	}
 
 	/**
