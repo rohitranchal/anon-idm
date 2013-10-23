@@ -50,6 +50,13 @@ exports.claimdef = function(req,res) {
 	});
 };
 
+exports.issue_claim = function(req, res) {
+	idm.issueSerializedClaim(req.body.claim, req.body.user, req.body.anonId, function(err, result) {
+		console.log(result);
+		res.send(result);
+	});
+};
+
 
 exports.claimdef_show = function(req,res) {
 	res.render('claimdef');

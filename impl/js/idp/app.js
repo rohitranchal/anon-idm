@@ -35,6 +35,7 @@ app.get('/claims/', routes.claims);
 app.get('/claim/:id', routes.claim);
 app.get('/claimdef/:id', routes.claimdef);
 
+app.post('/claim_service', routes.issue_claim);
 
 app.get('/useradd_show', routes.useradd_show);
 app.post('/useradd_process', routes.useradd_process);
