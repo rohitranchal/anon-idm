@@ -66,6 +66,10 @@ public class IDPTool {
 			System.out.println("-url Missing!");
 			printUsage();
 			System.exit(0);
+		} else if(action == null) {
+			System.out.println("-action Missing!");
+			printUsage();
+			System.exit(0);
 		}
 
 		IdentityProviderConnection conn = IdentityProviderConnectionFactory
@@ -112,21 +116,19 @@ public class IDPTool {
 		if (claimDefs.keySet().contains(claimName)) {
 
 			try {
-				//Get user's private key
+				// Get user's private key
 				KeyStore ks = KeyStore.getInstance("JKS");
 				FileInputStream is = new FileInputStream(storePath);
 				ks.load(is, storePass.toCharArray());
 				Key key = ks.getKey(alias, keyPass.toCharArray());
-				IdentityClaim issuedClaim = conn.requestClaim(claimDefs.get(claimName), (PrivateKey)key, user);
-				
+				IdentityClaim issuedClaim = conn.requestClaim(claimDefs.get(claimName), (PrivateKey) key, user);
+
 				System.out.println(issuedClaim.getClaim().serializeJSON());
-				//TODO Display and store
-				
+				// TODO Display and store
+
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			
-//			
 		} else {
 			System.out.println("Invalid claim : " + claimName);
 		}
@@ -148,9 +150,4 @@ public class IDPTool {
 				+ "-storepass <key store password> -alias <alias of private key> \n"
 				+ "-keypass <private key password>\n");
 	}
-
-	
-	
-	
-	
 }
