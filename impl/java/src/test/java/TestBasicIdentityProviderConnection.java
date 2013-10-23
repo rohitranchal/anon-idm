@@ -15,12 +15,7 @@ public class TestBasicIdentityProviderConnection {
 		configuration.put("claims_url", "http://localhost:3000/claims/");
 		configuration.put("cert_url", "http://localhost:3000/cert/");
 		System.err.println(conn.connect(configuration));
-		Collection<IdentityClaimDefinition> defs = conn.getAllClaimDefinitions();
-		for (Iterator iterator = defs.iterator(); iterator.hasNext();) {
-			IdentityClaimDefinition identityClaimDefinition = (IdentityClaimDefinition) iterator
-					.next();
-			System.out.println(identityClaimDefinition.getName());
-		}
+		
 		
 	}
 }

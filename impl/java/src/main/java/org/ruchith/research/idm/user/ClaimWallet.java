@@ -30,7 +30,7 @@ public class ClaimWallet {
 	 *            The claim instance to be stored.
 	 */
 	public void storeClaim(IdentityClaim claim) {
-		// TODO
+		System.out.println(claim.getClaim().getC1());
 	}
 
 }

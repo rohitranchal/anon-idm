@@ -53,7 +53,7 @@ public class IdentityClaimDefinition {
 		this.params = params;
 		this.masterKey = mk;
 	}
-
+	
 	public String getName() {
 		return name;
 	}

@@ -44,6 +44,11 @@
 			<id>mvn-repo</id>
 			<url>http://anon-idm.googlecode.com/svn/trunk/maven_repo/</url>
 		</repository>
+		<repository>
+			<id>repo2</id>
+			<url>http://repo1.maven.org/maven2/</url>
+		</repository>
+
 	</repositories>
 
 	<dependencies>
@@ -118,5 +123,16 @@
 			<artifactId>mysql-connector-java</artifactId>
 			<version>5.1.22</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpcore</artifactId>
+			<version>4.3</version>
+		</dependency>
+
 	</dependencies>
 </project>

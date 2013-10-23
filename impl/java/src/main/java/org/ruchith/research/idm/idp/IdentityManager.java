@@ -5,12 +5,13 @@ import it.unisa.dia.gas.plaf.jpbc.pairing.CurveParams;
 import it.unisa.dia.gas.plaf.jpbc.pairing.a1.TypeA1CurveGenerator;
 
 import java.io.FileInputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.Signature;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateFactory;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.List;
 import org.bouncycastle.util.encoders.Base64;
 import org.ruchith.ae.base.AEParameterGenerator;
 import org.ruchith.ae.base.AEParameters;
+import org.ruchith.ae.base.AEPrivateKey;
 import org.ruchith.ae.base.RootKeyGen;
 import org.ruchith.research.idm.IdentityClaim;
 import org.ruchith.research.idm.IdentityClaimDefinition;
@@ -63,8 +65,6 @@ public class IdentityManager {
 		paramGen.init(curveParams);
 		AEParameters params = paramGen.generateParameters();
 
-		RootKeyGen rkg = new RootKeyGen();
-		rkg.init(params);
 		Element mk = paramGen.getMasterKey();
 
 		IdentityClaimDefinition claimDef = new IdentityClaimDefinition(name, params, mk);
@@ -115,19 +115,69 @@ public class IdentityManager {
 	}
 
 	/**
+	 * Issue a claim and serialize it to be returned to the user.
+	 * 
+	 * @param claimName Name of the claim
+	 * @param user User name
+	 * @param req Serialized request element 
+	 * @return A Base64 encoded string of the claim. 
+	 */
+	public String issueSerializedClaim(String claimName, String user, String req) {
+		try {
+			IdentityClaim claim = this.issueClaim(claimName, user, req);
+			String claimStr = claim.getClaim().serializeJSON().toString();
+			return new String(Base64.encode(claimStr.getBytes()));
+		} catch (Exception e) {
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
+			e.printStackTrace(pw);
+			return sw.toString(); 
+//			return null;
+		}
+	}
+	
+	/**
 	 * Issue an identity claim to the given user.
 	 * 
-	 * @param name
-	 * @param user
-	 * @param userInput
-	 * @return
+	 * @param claimName Name of the claim
+	 * @param user User name
+	 * @param req Serialized request element 
+	 * @return An {@link IdentityClaim} instance or null
 	 * @throws Exception
 	 */
-	public IdentityClaim issueClaim(String name, String user, Element userInput) throws Exception {
-		// TODO
-		return new IdentityClaim();
+	public IdentityClaim issueClaim(String claimName, String user, String req) throws Exception {
+		//Check whether we know this user
+		String b64Cert = this.db.getUserCertValue(user);
+		if(b64Cert == null) { //User is not in DB
+			return null;
+		}
+		//TODO: Verify sig
+		
+		//Fetch claim info
+		IdentityClaimDefinition claimDef = this.db.getClaimDefinition(claimName);
+		
+		Element anonId = claimDef.getParams().getPairing().getG1().newElement();
+		anonId.setFromBytes(Base64.decode(req));
+		
+		RootKeyGen rkg = new RootKeyGen();
+		rkg.init(claimDef.getParams());
+		Element r = claimDef.getParams().getPairing().getZr().newRandomElement();
+		AEPrivateKey pk = rkg.genAnonKey(anonId, claimDef.getMasterKey(), r);
+		
+		//TODO : Apply policy
+				
+		IdentityClaim claim = new IdentityClaim();
+		claim.setClaim(pk);
+		
+		//TODO Store claim
+		
+		//TODO Encrypt
+		
+		return claim;
 	}
 
+	
+	
 	/**
 	 * Add a user entry with the given information.
 	 * 
