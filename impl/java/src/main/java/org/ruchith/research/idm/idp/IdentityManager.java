@@ -169,7 +169,8 @@ public class IdentityManager {
 		IdentityClaim claim = new IdentityClaim();
 		claim.setClaim(pk);
 		
-		//TODO Store claim
+		//Store claim
+		this.db.storeClaim(claimName, user, r, anonId);
 		
 		//TODO Encrypt
 		

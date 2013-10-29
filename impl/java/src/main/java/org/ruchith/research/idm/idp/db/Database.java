@@ -10,6 +10,7 @@ import org.bouncycastle.util.encoders.Base64;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
 import org.ruchith.ae.base.AEParameters;
+import org.ruchith.research.idm.IdentityClaim;
 import org.ruchith.research.idm.IdentityClaimDefinition;
 
 /**
@@ -113,6 +114,18 @@ public class Database {
 			return null;
 		}
 		
+	}
+	
+	public void storeClaim(String claimName, String user, Element r, Element anonId)
+			throws Exception {
+
+		String rB64 = new String(Base64.encode(r.toBytes()));
+		String anonIdB64 = new String(Base64.encode(anonId.toBytes()));
+		
+		String sql = "INSERT INTO Claim (ClaimName, UserName, UserRandom, UserAnonId) " +
+				"VALUES ('" + claimName + "','" + user + "','" + rB64 + "','" + anonIdB64 + "')";
+		
+		con.createStatement().execute(sql);
 	}
 	
 	/**
