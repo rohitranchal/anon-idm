@@ -11,6 +11,8 @@ import org.ruchith.research.idm.IdentityClaim;
 public class ClaimWallet {
 
 	private ClaimWallet() {
+		//Look for the local wallet instance
+		
 	}
 
 	private static ClaimWallet instance;

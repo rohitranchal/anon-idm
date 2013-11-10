@@ -116,6 +116,14 @@ public class Database {
 		
 	}
 	
+	/**
+	 * Store user claim issuance information. 
+	 * @param claimName Name of the claim.
+	 * @param user User name
+	 * @param r Random number created for the user's private key
+	 * @param anonId
+	 * @throws Exception
+	 */
 	public void storeClaim(String claimName, String user, Element r, Element anonId)
 			throws Exception {
 

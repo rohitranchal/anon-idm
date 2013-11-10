@@ -34,15 +34,14 @@ public class Configuration {
 	 */
 	private Configuration() throws RuntimeException {
 		this.userHome = System.getProperty("user.home");
-		String configFilePath = this.userHome + File.separator
-				+ IDPConstants.CONFIG_DIR + File.separator
+		String configFilePath = this.userHome + File.separator + IDPConstants.CONFIG_DIR + File.separator
 				+ IDPConstants.CONFIG_FILE;
-		
-		//check whether the configuration file exists
-		if(!new File(configFilePath).exists()) {
+
+		// check whether the configuration file exists
+		if (!new File(configFilePath).exists()) {
 			throw new RuntimeException("Invalid configuration");
 		}
-		
+
 		Properties prop = new Properties();
 		try {
 			prop.load(new FileInputStream(configFilePath));
@@ -77,11 +76,11 @@ public class Configuration {
 
 	/**
 	 * Return the full path of the keystore file.
+	 * 
 	 * @return
 	 */
 	public String getKeystoreFilePath() {
-		return this.userHome + File.separator + IDPConstants.CONFIG_DIR
-				+ File.separator + this.keystoreName;
+		return this.userHome + File.separator + IDPConstants.CONFIG_DIR + File.separator + this.keystoreName;
 	}
 
 	public String getKeystoreName() {
