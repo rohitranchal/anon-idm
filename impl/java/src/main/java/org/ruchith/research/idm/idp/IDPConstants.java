@@ -7,11 +7,6 @@ package org.ruchith.research.idm.idp;
  *
  */
 public class IDPConstants {
-
-	/**
-	 * There will be a directory called .idp in the home directory.
-	 */
-	public static final String CONFIG_DIR = ".idp";
 	
 	/**
 	 * Main configuration file

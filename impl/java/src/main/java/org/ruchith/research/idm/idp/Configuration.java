@@ -25,21 +25,21 @@ public class Configuration {
 	private String dbPassword;
 	private String dbHost;
 
-	private String userHome;
+	private String configDirPath;
 
 	/**
 	 * Read configuration file and populate properties.
 	 * 
 	 * @throws RuntimeException
 	 */
-	private Configuration() throws RuntimeException {
-		this.userHome = System.getProperty("user.home");
-		String configFilePath = this.userHome + File.separator + IDPConstants.CONFIG_DIR + File.separator
+	private Configuration(String configPath) throws RuntimeException {
+		this.configDirPath = configPath;
+		String configFilePath = this.configDirPath + File.separator
 				+ IDPConstants.CONFIG_FILE;
 
 		// check whether the configuration file exists
 		if (!new File(configFilePath).exists()) {
-			throw new RuntimeException("Invalid configuration");
+			throw new RuntimeException("Invalid configuration" + configFilePath);
 		}
 
 		Properties prop = new Properties();
@@ -66,9 +66,9 @@ public class Configuration {
 	 * 
 	 * @return Populated {@link Configuration} instance.
 	 */
-	public static Configuration getInstance() {
+	public static Configuration getInstance(String configPath) {
 		if (config == null) {
-			config = new Configuration();
+			config = new Configuration(configPath);
 		}
 
 		return config;
@@ -80,7 +80,7 @@ public class Configuration {
 	 * @return
 	 */
 	public String getKeystoreFilePath() {
-		return this.userHome + File.separator + IDPConstants.CONFIG_DIR + File.separator + this.keystoreName;
+		return this.configDirPath + File.separator + this.keystoreName;
 	}
 
 	public String getKeystoreName() {

@@ -2,23 +2,23 @@ var db = require('../db');
 fs = require('fs');
 
 var java = require("java");
-java.classpath.push("/Users/ruchith/Documents/workspace/idm/target/lib/base-0.1.jar");
-java.classpath.push("/Users/ruchith/Documents/workspace/idm/target/lib/bcprov-jdk16-1.46.jar");
-java.classpath.push("/Users/ruchith/Documents/workspace/idm/target/lib/jackson-core-asl-1.9.4.jar");
-java.classpath.push("/Users/ruchith/Documents/workspace/idm/target/lib/jackson-jaxrs-1.9.4.jar");
-java.classpath.push("/Users/ruchith/Documents/workspace/idm/target/lib/jackson-mapper-asl-1.9.4.jar");
-java.classpath.push("/Users/ruchith/Documents/workspace/idm/target/lib/jackson-mrbean-1.9.4.jar");
-java.classpath.push("/Users/ruchith/Documents/workspace/idm/target/lib/jackson-xc-1.9.4.jar");
-java.classpath.push("/Users/ruchith/Documents/workspace/idm/target/lib/jpbc-api-1.1.0.jar");
-java.classpath.push("/Users/ruchith/Documents/workspace/idm/target/lib/jpbc-crypto-1.1.0.jar");
-java.classpath.push("/Users/ruchith/Documents/workspace/idm/target/lib/jpbc-pbc-1.1.0.jar");
-java.classpath.push("/Users/ruchith/Documents/workspace/idm/target/lib/jpbc-plaf-1.1.0.jar");
-java.classpath.push("/Users/ruchith/Documents/workspace/idm/target/lib/junit-3.8.1.jar");
-java.classpath.push("/Users/ruchith/Documents/workspace/idm/target/lib/mysql-connector-java-5.1.22.jar");
-java.classpath.push("/Users/ruchith/Documents/workspace/idm/target/idp-1.0-SNAPSHOT.jar");
+java.classpath.push("/Users/ruchith/Documents/research/anon_idm/trunk/impl/java/target/lib/base-0.1.jar");
+java.classpath.push("/Users/ruchith/Documents/research/anon_idm/trunk/impl/java/target/lib/bcprov-jdk16-1.46.jar");
+java.classpath.push("/Users/ruchith/Documents/research/anon_idm/trunk/impl/java/target/lib/jackson-core-asl-1.9.4.jar");
+java.classpath.push("/Users/ruchith/Documents/research/anon_idm/trunk/impl/java/target/lib/jackson-jaxrs-1.9.4.jar");
+java.classpath.push("/Users/ruchith/Documents/research/anon_idm/trunk/impl/java/target/lib/jackson-mapper-asl-1.9.4.jar");
+java.classpath.push("/Users/ruchith/Documents/research/anon_idm/trunk/impl/java/target/lib/jackson-mrbean-1.9.4.jar");
+java.classpath.push("/Users/ruchith/Documents/research/anon_idm/trunk/impl/java/target/lib/jackson-xc-1.9.4.jar");
+java.classpath.push("/Users/ruchith/Documents/research/anon_idm/trunk/impl/java/target/lib/jpbc-api-1.1.0.jar");
+java.classpath.push("/Users/ruchith/Documents/research/anon_idm/trunk/impl/java/target/lib/jpbc-crypto-1.1.0.jar");
+java.classpath.push("/Users/ruchith/Documents/research/anon_idm/trunk/impl/java/target/lib/jpbc-pbc-1.1.0.jar");
+java.classpath.push("/Users/ruchith/Documents/research/anon_idm/trunk/impl/java/target/lib/jpbc-plaf-1.1.0.jar");
+java.classpath.push("/Users/ruchith/Documents/research/anon_idm/trunk/impl/java/target/lib/junit-3.8.1.jar");
+java.classpath.push("/Users/ruchith/Documents/research/anon_idm/trunk/impl/java/target/lib/mysql-connector-java-5.1.22.jar");
+java.classpath.push("/Users/ruchith/Documents/research/anon_idm/trunk/impl/java/target/idp-1.0-SNAPSHOT.jar");
 
 var IdentityManager = java.import('org.ruchith.research.idm.idp.IdentityManager');
-var idm = new IdentityManager();
+var idm = new IdentityManager("/Users/ruchith/Documents/research/anon_idm/trunk/impl/java/config");
 
 /*
  * GET home page.

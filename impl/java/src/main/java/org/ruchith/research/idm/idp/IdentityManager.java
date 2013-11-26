@@ -37,8 +37,8 @@ public class IdentityManager {
 
 	private Database db;
 
-	public IdentityManager() throws Exception {
-		this.config = Configuration.getInstance();
+	public IdentityManager(String configPath) throws Exception {
+		this.config = Configuration.getInstance(configPath);
 
 		// Read the keystore and get the private key
 		KeyStore ks = KeyStore.getInstance(config.getKeystoreType());
