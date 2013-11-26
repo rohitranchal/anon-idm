@@ -17,8 +17,10 @@ java.classpath.push("/Users/ruchith/Documents/research/anon_idm/trunk/impl/java/
 java.classpath.push("/Users/ruchith/Documents/research/anon_idm/trunk/impl/java/target/lib/mysql-connector-java-5.1.22.jar");
 java.classpath.push("/Users/ruchith/Documents/research/anon_idm/trunk/impl/java/target/idp-1.0-SNAPSHOT.jar");
 
+var configDir = "/Users/ruchith/Documents/research/anon_idm/trunk/impl/java/config";
+
 var IdentityManager = java.import('org.ruchith.research.idm.idp.IdentityManager');
-var idm = new IdentityManager("/Users/ruchith/Documents/research/anon_idm/trunk/impl/java/config");
+var idm = new IdentityManager(configDir);
 
 /*
  * GET home page.
@@ -87,7 +89,7 @@ exports.admin_show = function(req, res) {
 }
 
 exports.cert = function(req,res) {
-	fs.readFile('/Users/ruchith/.idp/cert', 'utf8', function (err,data) {
+	fs.readFile(configDir + '/cert', 'utf8', function (err,data) {
 		if (err) {
 			return console.log(err);
 		}
