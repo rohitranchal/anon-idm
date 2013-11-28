@@ -123,7 +123,7 @@ public class IDPTool {
 				Key key = ks.getKey(alias, keyPass.toCharArray());
 				IdentityClaim issuedClaim = conn.requestClaim(claimDefs.get(claimName), (PrivateKey) key, user);
 
-				System.out.println(issuedClaim.getClaim().serializeJSON());
+				System.out.println(issuedClaim.serializeJSON());
 				// TODO Display and store
 
 			} catch (Exception e) {

@@ -2,6 +2,7 @@ package org.ruchith.research.idm;
 
 import it.unisa.dia.gas.jpbc.Element;
 
+import org.bouncycastle.util.encoders.Base64;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
@@ -55,12 +56,16 @@ public class IdentityClaim {
 		this.claimKey = claimKey;
 	}
 
-//	public String serializeJSON() {
-//		ObjectMapper mapper = new ObjectMapper();
-//		JsonNode rootNode = mapper.createObjectNode();
-//		ObjectNode on = (ObjectNode) rootNode;
-//		
-//		return null;
-//	}
+	public String serializeJSON() {
+		ObjectMapper mapper = new ObjectMapper();
+		JsonNode rootNode = mapper.createObjectNode();
+		ObjectNode on = (ObjectNode) rootNode;
+		
+		on.put("claimDef", this.definition.serializeJSON());
+		on.put("claim", this.claim.serializeJSON().toString());
+		on.put("claimKey", new String(Base64.encode(this.claimKey.toBytes())));
+		
+		return on.toString();
+	}
 	
 }

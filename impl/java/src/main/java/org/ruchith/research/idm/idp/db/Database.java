@@ -2,6 +2,8 @@ package org.ruchith.research.idm.idp.db;
 
 import it.unisa.dia.gas.jpbc.Element;
 
+import java.io.ByteArrayInputStream;
+import java.security.cert.CertificateFactory;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -10,7 +12,6 @@ import org.bouncycastle.util.encoders.Base64;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
 import org.ruchith.ae.base.AEParameters;
-import org.ruchith.research.idm.IdentityClaim;
 import org.ruchith.research.idm.IdentityClaimDefinition;
 
 /**
@@ -62,8 +63,8 @@ public class Database {
 				+ claimDef.getName() + "','" + claimDef.getDescription()
 				+ "','" + new String(Base64.encode(claimDef.getMasterKey().toBytes())) + "','"
 				+ new String(Base64.encode(paramsJsonBytes)) + "','"
-				+ claimDef.getB64Hash() + "','" + claimDef.getB64Sig() + "',"
-				+ "NOW())";
+				+ claimDef.getB64Hash() + "','" + claimDef.getB64Sig() + "','"
+				+ new String(Base64.encode(claimDef.getCert().getEncoded())) + "'," + "NOW())";
 		
 		con.createStatement().execute(sql);
 	}
@@ -93,6 +94,7 @@ public class Database {
 			String pubParams = rs.getString("PublicParams");
 			String dgst = rs.getString("Digest");
 			String sig = rs.getString("Sig");
+			String b64Cert = rs.getString("Cert");
 			
 			//b64 decode
 			byte[] paramsJsonBytes = Base64.decode(pubParams);
@@ -108,6 +110,10 @@ public class Database {
 			claimDef.setDescription(desc);
 			claimDef.setB64Hash(dgst);
 			claimDef.setB64Sig(sig);
+			
+			ByteArrayInputStream bais = new ByteArrayInputStream(Base64.decode(b64Cert));
+			claimDef.setCert(CertificateFactory.getInstance("X.509")
+					.generateCertificate(bais));
 			
 			return claimDef;
 		} else {
@@ -137,13 +143,29 @@ public class Database {
 	}
 	
 	/**
-	 * Get the given user's pub key certificate value
+	 * Get the given user's pub key certificate value 
 	 * @param user User name
 	 * @return Stored certificate as a string or null if user not present
 	 * @throws Exception
 	 */
 	public String getUserCertValue(String user) throws Exception {
-		String sql = "SELECT PubKeyCertificate FROM User";
+		String sql = "SELECT PubKeyCertificate FROM User where Name='" + user +"'";
+		ResultSet rs = con.createStatement().executeQuery(sql);
+		if(rs.next()) {
+			return rs.getString("PubKeyCertificate");
+		} else {
+			return null;
+		}
+	}
+	
+	/**
+	 * Get the given user's pub key certificate value by cert fingerprint.
+	 * @param fpr Base64 encoded certificate fingerprint value.
+	 * @return Stored certificate as a string or null if user not present
+	 * @throws Exception
+	 */
+	public String getUserCertValueByFpr(String fpr) throws Exception {
+		String sql = "SELECT PubKeyCertificate FROM User where PubKeyCertificateFpr='" + fpr +"'";
 		ResultSet rs = con.createStatement().executeQuery(sql);
 		if(rs.next()) {
 			return rs.getString("PubKeyCertificate");

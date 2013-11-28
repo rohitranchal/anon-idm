@@ -1,7 +1,14 @@
 package org.ruchith.research.idm;
 
+import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
+
 import it.unisa.dia.gas.jpbc.Element;
 
+import org.bouncycastle.util.encoders.Base64;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.node.ObjectNode;
 import org.ruchith.ae.base.AEParameters;
 
 /**
@@ -27,8 +34,7 @@ public class IdentityClaimDefinition {
 	private AEParameters params;
 
 	/**
-	 * Master key associated with this claim. This is used in issuing new claim
-	 * instances.
+	 * Master key associated with this claim. This is used in issuing new claim instances.
 	 */
 	private Element masterKey;
 
@@ -38,10 +44,14 @@ public class IdentityClaimDefinition {
 	private String b64Hash;
 
 	/**
-	 * Identity provider's signature on the SHA512 digest.
-	 * Sig(SHA512(name||params))
+	 * Identity provider's signature on the SHA512 digest. Sig(SHA512(name||params))
 	 */
 	private String b64Sig;
+
+	/**
+	 * PUblic key certificate of issuer.
+	 */
+	private Certificate cert;
 
 	public IdentityClaimDefinition(String name, AEParameters params) {
 		this.name = name;
@@ -53,7 +63,7 @@ public class IdentityClaimDefinition {
 		this.params = params;
 		this.masterKey = mk;
 	}
-	
+
 	public String getName() {
 		return name;
 	}
@@ -94,4 +104,30 @@ public class IdentityClaimDefinition {
 		return this.getName() + this.getParams().serializeJSON();
 	}
 
+	public Certificate getCert() {
+		return cert;
+	}
+
+	public void setCert(Certificate cert) {
+		this.cert = cert;
+	}
+
+	public String serializeJSON() {
+		ObjectMapper mapper = new ObjectMapper();
+		JsonNode rootNode = mapper.createObjectNode();
+		ObjectNode on = (ObjectNode) rootNode;
+
+		on.put("name", this.name);
+		on.put("params", this.params.serializeJSON());
+		on.put("desc", this.description);
+		on.put("dgst", this.b64Hash);
+		on.put("sig", this.b64Sig);
+		try {
+			on.put("cert", new String(Base64.encode(this.cert.getEncoded())));
+		} catch (CertificateEncodingException e) {
+			throw new RuntimeException(e);
+		}
+
+		return on.toString();
+	}
 }

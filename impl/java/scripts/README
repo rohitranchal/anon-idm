@@ -1,0 +1,1 @@
+./idptool -action req_claim -url http://localhost:3000 -claim student -user alice -keystore ../../common/alice.jks -storepass alicekey -alias alice -keypass alicekey

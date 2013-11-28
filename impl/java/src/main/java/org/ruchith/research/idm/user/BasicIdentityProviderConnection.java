@@ -80,6 +80,7 @@ public class BasicIdentityProviderConnection implements IdentityProviderConnecti
 				String params = node.get("PublicParams").asText();
 				String b64Dgst = node.get("Digest").asText();
 				String b64Sig = node.get("Sig").asText();
+				String b64Cert = node.get("Cert").asText();
 				// String createDate = node.get("DateCreated").asText();
 
 				ObjectNode on = (ObjectNode) mapper.readTree(Base64.decode(params));
@@ -109,6 +110,11 @@ public class BasicIdentityProviderConnection implements IdentityProviderConnecti
 
 				tmpDef.setB64Hash(b64Dgst);
 				tmpDef.setB64Sig(b64Sig);
+				
+				ByteArrayInputStream bais = new ByteArrayInputStream(Base64.decode(b64Cert));
+				tmpDef.setCert(CertificateFactory.getInstance("X.509")
+						.generateCertificate(bais));
+				
 
 				this.claims.put(name, tmpDef);
 			}
@@ -169,6 +175,7 @@ public class BasicIdentityProviderConnection implements IdentityProviderConnecti
 			
 			//Create identity claim instance
 			IdentityClaim issuedClaim = new IdentityClaim();
+			issuedClaim.init(claim);
 			issuedClaim.setClaim(pk);
 			
 			return issuedClaim;			
@@ -188,6 +195,7 @@ public class BasicIdentityProviderConnection implements IdentityProviderConnecti
 
 		IdentityClaim issuedClaim = this.requestClaim(claim, privKey, i1, user);
 		issuedClaim.setClaimKey(i1); //Add the claim key value
+		
 
 		return issuedClaim;
 	}

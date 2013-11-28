@@ -6,6 +6,7 @@ CREATE TABLE Claim_Definition (
 	PublicParams TEXT NOT NULL,
 	Digest TEXT NOT NULL,
 	Sig TEXT NOT NULL,
+	Cert TEXT NOT NULL,
 	DateCreated TIMESTAMP NOT NULL	
 );
 
