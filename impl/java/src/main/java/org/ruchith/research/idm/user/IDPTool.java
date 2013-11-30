@@ -1,5 +1,7 @@
 package org.ruchith.research.idm.user;
 
+import it.unisa.dia.gas.jpbc.Element;
+
 import java.io.FileInputStream;
 import java.security.Key;
 import java.security.KeyStore;
@@ -23,7 +25,12 @@ import org.ruchith.research.idm.IdentityClaimDefinition;
  */
 public class IDPTool {
 
-	public static void main(String[] args) {
+	private static ClaimWallet claimWallet;
+	
+	public static void main(String[] args) throws Exception {
+		
+		claimWallet = ClaimWallet.getInstance();
+		
 		if (args.length == 0) {
 			// Print usage and exit
 			printUsage();
@@ -121,10 +128,13 @@ public class IDPTool {
 				FileInputStream is = new FileInputStream(storePath);
 				ks.load(is, storePass.toCharArray());
 				Key key = ks.getKey(alias, keyPass.toCharArray());
-				IdentityClaim issuedClaim = conn.requestClaim(claimDefs.get(claimName), (PrivateKey) key, user);
+				
+				IdentityClaimDefinition claimDef = claimDefs.get(claimName);				
+				IdentityClaim issuedClaim = conn.requestClaim(claimDef, (PrivateKey) key, user);
 
 				System.out.println(issuedClaim.serializeJSON());
-				// TODO Display and store
+				
+				claimWallet.storeClaim(issuedClaim);
 
 			} catch (Exception e) {
 				e.printStackTrace();

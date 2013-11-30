@@ -1,9 +1,9 @@
 package org.ruchith.research.idm;
 
+import it.unisa.dia.gas.jpbc.Element;
+
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
-
-import it.unisa.dia.gas.jpbc.Element;
 
 import org.bouncycastle.util.encoders.Base64;
 import org.codehaus.jackson.JsonNode;
@@ -53,6 +53,14 @@ public class IdentityClaimDefinition {
 	 */
 	private Certificate cert;
 
+	public IdentityClaimDefinition(ObjectNode on) {
+		this.name = on.get("name").getTextValue();
+		this.description = on.get("desc").getTextValue();
+		this.b64Hash = on.get("dgst").getTextValue();
+		this.b64Sig = on.get("sig").getTextValue();
+		this.params = new AEParameters((ObjectNode)on.get("params"));
+	}
+	
 	public IdentityClaimDefinition(String name, AEParameters params) {
 		this.name = name;
 		this.params = params;
@@ -112,7 +120,7 @@ public class IdentityClaimDefinition {
 		this.cert = cert;
 	}
 
-	public String serializeJSON() {
+	public ObjectNode serializeJSON() {
 		ObjectMapper mapper = new ObjectMapper();
 		JsonNode rootNode = mapper.createObjectNode();
 		ObjectNode on = (ObjectNode) rootNode;
@@ -128,6 +136,6 @@ public class IdentityClaimDefinition {
 			throw new RuntimeException(e);
 		}
 
-		return on.toString();
+		return on;
 	}
 }

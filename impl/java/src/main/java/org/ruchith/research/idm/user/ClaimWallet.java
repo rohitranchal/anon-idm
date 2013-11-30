@@ -3,6 +3,7 @@ package org.ruchith.research.idm.user;
 import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import org.apache.commons.io.FileUtils;
 import org.ruchith.research.idm.IdentityClaim;
@@ -15,22 +16,24 @@ import org.ruchith.research.idm.IdentityClaim;
  */
 public class ClaimWallet {
 
-	private File walletDir; 
-	
+	private File walletDir;
+
 	private ClaimWallet() throws Exception {
-		//Look for the local wallet instance in current directory
+		// Look for the local wallet instance in current directory
 		this.walletDir = new File("wallet");
-		if(!this.walletDir.exists()) {
+		if (!this.walletDir.exists()) {
 			this.walletDir.mkdir();
 		}
-		Collection claimFileList = FileUtils.listFiles(this.walletDir, new String[] {"claim"}, false);
-		
-		
-//		String walletData = FileUtils.readFileToString(walletFile);
+		Collection<File> claimFileList = FileUtils.listFiles(this.walletDir, new String[] { "claim" }, false);
+		for (Iterator<File> iterator = claimFileList.iterator(); iterator.hasNext();) {
+			File claimFile = iterator.next();
+			
+			
+		}
 	}
 
 	private static ClaimWallet instance;
-	
+
 	/**
 	 * Map of claims stored in this wallet. Keys are claim definition hash values.
 	 */
@@ -51,10 +54,12 @@ public class ClaimWallet {
 	 *            The claim instance to be stored.
 	 */
 	public void storeClaim(IdentityClaim claim) throws Exception {
-		String key = claim.getDefinition().getB64Hash();
+		// Remove directory seperator to avoid issue in creating the claim file
+		String key = claim.getDefinition().getB64Hash().replace(File.separator, "").replace("\\", "").replace("=", "")
+				.replace("+", "");
 		this.claims.put(key, claim);
-		
-		//Store in wallet directory
+
+		// Store in wallet directory
 		String claimFilePath = this.walletDir.getAbsolutePath() + File.separator + key + ".claim";
 		FileUtils.writeStringToFile(new File(claimFilePath), claim.serializeJSON());
 	}
