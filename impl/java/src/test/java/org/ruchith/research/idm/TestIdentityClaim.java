@@ -12,7 +12,7 @@ public class TestIdentityClaim {
 
 	@Test
 	public void testDeserialization() throws Exception {
-		InputStream in = getClass().getResourceAsStream("/wallet/gE6SboKAyvKAUw9QXbC6NuwcJZe9YjObnqkx618HAW5EaYgrTxcjQqbOw49LcoQgFa6WcHItQUEcFyizABgw.claim");
+		InputStream in = getClass().getResourceAsStream("/wallet/gE6SboKAyvKAUw9QXbC6NuwcJZe9YjObnqkx618HAW5EaYgrTxcjQqbOw49LcoQgFa6WcHItQUEcFyizABgw");
 		
 		String content = "";
 		byte[] data = new byte[1024];
@@ -27,5 +27,5 @@ public class TestIdentityClaim {
 		IdentityClaim claim = new IdentityClaim(on);
 		Assert.assertEquals("professor", claim.getDefinition().getName());
 	}
-	
+
 }
