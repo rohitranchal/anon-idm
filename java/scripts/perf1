@@ -1,0 +1,1 @@
+java -cp ../target/idp-1.0-SNAPSHOT.jar:../target/lib/mysql-connector-java-5.1.22-bin.jar:../target/lib/* org.ruchith.research.idm.idp.perf.PerfTestIdentityManager $*

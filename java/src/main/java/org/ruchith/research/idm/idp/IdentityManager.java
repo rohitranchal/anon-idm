@@ -16,6 +16,7 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.bouncycastle.util.encoders.Base64;
@@ -98,8 +99,11 @@ public class IdentityManager {
 		//Set the pub key cert of the idp
 		claimDef.setCert(this.cert);
 
+		long start = new Date().getTime();
 		this.db.storeClaimDefinition(claimDef);
-
+		long end = new Date().getTime();
+		System.out.println("PERF:Store_Claim_Def:" + (end-start));
+		
 		return claimDef;
 	}
 
