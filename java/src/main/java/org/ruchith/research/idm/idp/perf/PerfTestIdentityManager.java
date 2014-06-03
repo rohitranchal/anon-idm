@@ -10,13 +10,18 @@ public class PerfTestIdentityManager {
 
 		IdentityManager idm = new IdentityManager(args[0]);
 
-		for (int i = 1; i < 100; i++) {
+		int total = 0;
+		for (int i = 0; i < 1001; i++) {
 			long start = new Date().getTime();
 			idm.generateNewClaimDefinition("Test:" + i + ":", "Test Desc");
 			long end = new Date().getTime();
-			System.out.println(i + ":" + (end - start));
-
+//			System.out.println(i + ":" + (end - start));
+			if(i > 0) {
+				total += end - start;
+			}
 		}
+		
+		System.out.println("Average:" + (total/1000));
 	}
 
 }
