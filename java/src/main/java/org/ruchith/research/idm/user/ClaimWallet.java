@@ -39,7 +39,8 @@ public class ClaimWallet {
 			String content = FileUtils.readFileToString(claimFile);
 			ObjectMapper mapper = new ObjectMapper();
 			ObjectNode on = (ObjectNode) mapper.readTree(content.toString());
-			this.claims.put(claimFile.getName(), new IdentityClaim(on));
+			IdentityClaim claim = new IdentityClaim(on);
+			this.claims.put(claim.getDefinition().getName(), claim);
 		}
 	}
 
