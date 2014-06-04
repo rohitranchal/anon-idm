@@ -31,7 +31,13 @@ client.generateRequest('student', function(err, val){
 	//Make request to authenticate
 	request.post('http://localhost:8001/authenticate', {form:{request:val}}, function (error, response, body) {
 	  if (!error && response.statusCode == 200) {
-	    console.log(body) // Print the google web page.
+		client.extractSessionKey('student', body, function(err, val){
+			if(typeof err != 'undefined') {
+				console.log(err);
+			} else {
+				console.log(val);
+			}
+		});
 	  }
 	});
 });

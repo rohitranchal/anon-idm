@@ -53,11 +53,14 @@ var sessions = new Array();
 exports.authenticate = function(req, res) {
 	var user_req = req.body.request;
 
-	var session_key = uuid.v4();
+	// var session_key = uuid.v4();
 
 	//Encrypt session key
-	sp.createChallange(user_req, claim_def_student, session_key, function(err, val){
-		res.send(val);
+	sp.createChallange(user_req, claim_def_student, function(err, val){
+		val = JSON.parse(val);
+		console.log(val.SessionKey);
+		sessions[sessions.length] = val.SessionKey;
+		res.send(val.EncryptedKey);
 		if(typeof err != 'undefined') {
 			console.log(err);
 		}
