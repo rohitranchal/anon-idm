@@ -10,10 +10,10 @@ table
 
 	for entry in entries
 		tr
-			td=entry.Name
-			td=entry.Description
+			td=entry.name
+			td=entry.description
 			td=entry.DateCreated
 			td
-				a(href='/claim/' + entry.Name)='Details'
+				a(href='/claim/' + entry.name)='Details'
 			td
-				a(href='/claimdef/' + entry.Name)='Raw'
+				a(href='/claimdef/' + entry.name)='Raw'

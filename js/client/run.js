@@ -25,15 +25,15 @@ java.classpath.push(jars_dir + "idp-1.0-SNAPSHOT.jar");
 var Client = java.import('org.ruchith.research.idm.user.Client');
 var client = new Client(wallet_dir);
 
+//Generate request value for "student"
 client.generateRequest('student', function(err, val){
-	console.log(val);	
+
+	//Make request to authenticate
+	request.post('http://localhost:8001/authenticate', {form:{request:val}}, function (error, response, body) {
+	  if (!error && response.statusCode == 200) {
+	    console.log(body) // Print the google web page.
+	  }
+	});
 });
 
 
-//Generate request value for "student"
-
-// request.post('http://localhost:8001', {form:{key:'value'}} function (error, response, body) {
-//   if (!error && response.statusCode == 200) {
-//     console.log(body) // Print the google web page.
-//   }
-// });
