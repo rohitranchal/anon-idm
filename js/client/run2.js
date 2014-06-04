@@ -25,8 +25,6 @@ java.classpath.push(jars_dir + "idp-1.0-SNAPSHOT.jar");
 var Client = java.import('org.ruchith.research.idm.user.Client');
 var client = new Client(wallet_dir);
 
-
-
 client.generateRequest('student', function(err, val1){
 
 	client.generateRequest('candidate', function(err, val2){
@@ -34,15 +32,17 @@ client.generateRequest('student', function(err, val1){
 		//Make request to authenticate
 		request.post('http://localhost:8001/authenticate_two_claims', {form:{request1:val1, request2:val2}}, function (error, response, body) {
 			if (!error && response.statusCode == 200) {
-
-				console.log(body);
+				
 				var challenge = JSON.parse(body);
 
-				client.extractSessionKeyDouble('student', 'candidate', JSON.stringify(challenge.student), JSON.stringify(challenge.candidate), function(err, val){
+				client.extractSessionKeyDouble('student', 'candidate', JSON.stringify(challenge.student), JSON.stringify(challenge.candidate), function(err, sk){
 					if(typeof err != 'undefined') {
 						console.log(err);
 					} else {
-						console.log(val);
+						//Make request to operation
+						request.post('http://localhost:8001/operation', {form:{session_key:sk}}, function (error2, response2, body2) {
+							console.log(body2);
+						});
 					}
 				});
 			}

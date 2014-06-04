@@ -48,19 +48,22 @@ exports.index = function(req, res){
 
 
 var sessions = new Array();
+var last_session = null;
 
 exports.authenticate = function(req, res) {
 	var user_req = req.body.request;
 
 	//Encrypt session key
 	sp.createChallange(user_req, claim_def_student, function(err, val){
-		val = JSON.parse(val);
-		console.log(val.SessionKey);
-		sessions[sessions.length] = val.SessionKey;
-		res.send(val.student);
 		if(typeof err != 'undefined') {
 			console.log(err);
 		}
+
+		val = JSON.parse(val);
+		last_session = val.SessionKey;
+		sessions[sessions.length] = val.SessionKey;
+		res.send(val.student);
+
 	});
 };
 
@@ -73,10 +76,12 @@ exports.authenticate_two_claims = function(req, res) {
 		if(typeof err != 'undefined') {
 			console.log(err);
 		}
-		console.log(val);
 		val = JSON.parse(val);
-		console.log(val.SessionKey);
-		sessions[sessions.length] = val.SessionKey;
+
+		var session_key = val.SessionKey;
+
+		sessions[sessions.length] = session_key;
+		last_session = session_key;
 		var result = {};
 		result.student = val.student;
 		result.candidate = val.candidate;
@@ -86,5 +91,22 @@ exports.authenticate_two_claims = function(req, res) {
 };
 
 exports.operation = function(req, res) {
+	var session_key = req.body.session_key;
 
+	//first check last session
+	if(last_session === session_key) {
+		res.send('Access Granted');
+		return;
+	}
+
+	//not the last session check others
+	for(var i = 0; i < sessions.length; i++) {
+		console.log(session_key + ' == ' + sessions[i]);
+		if(sessions[i] === session_key) {
+			res.send('Access Granted');
+			return;
+		}
+	}
+
+	res.send('Access Denied');
 };

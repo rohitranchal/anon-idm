@@ -31,11 +31,14 @@ client.generateRequest('student', function(err, val){
 	//Make request to authenticate
 	request.post('http://localhost:8001/authenticate', {form:{request:val}}, function (error, response, body) {
 		if (!error && response.statusCode == 200) {
-			client.extractSessionKey('student', body, function(err, val){
+			client.extractSessionKey('student', body, function(err, sk){
 				if(typeof err != 'undefined') {
 					console.log(err);
 				} else {
-					console.log(val);
+					//Make request to operation
+					request.post('http://localhost:8001/operation', {form:{session_key:sk}}, function (error2, response2, body2) {
+						console.log(body2);
+					});
 				}
 			});
 		}
