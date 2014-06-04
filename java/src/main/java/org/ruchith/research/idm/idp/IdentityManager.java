@@ -83,25 +83,19 @@ public class IdentityManager {
 
 		byte[] contentBytes = claimDef.getDgstContet().getBytes();
 
-		long t1 = new Date().getTime();
 		// Create digest
 		MessageDigest dgst = MessageDigest.getInstance("SHA-512");
 		dgst.update(contentBytes);
 		byte[] sha512Dgst = dgst.digest();
-		long t2 = new Date().getTime();
 		claimDef.setB64Hash(new String(Base64.encode(sha512Dgst)));
 
-		long t3 = new Date().getTime();
 		// Sign claim definition
 		Signature sig = Signature.getInstance("SHA512withRSA");
 		sig.initSign(this.privKey);
 		sig.update(contentBytes);
 		byte[] sigBytes = sig.sign();
-		long t4 = new Date().getTime();
 		claimDef.setB64Sig(new String(Base64.encode(sigBytes)));
 		
-		System.out.println("DGST: " + (t2 - t1));
-		System.out.println("SIG: " + (t4 - t3));
 		//Set the pub key cert of the idp
 		claimDef.setCert(this.cert);
 
