@@ -1,8 +1,8 @@
 package org.ruchith.research.idm.user;
 
-import it.unisa.dia.gas.jpbc.Element;
-
 import java.util.HashMap;
+
+import it.unisa.dia.gas.jpbc.Element;
 
 import org.bouncycastle.util.encoders.Base64;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -19,11 +19,7 @@ public class Client {
 
 	private ClaimWallet wallet;
 
-	public ClaimWallet getWallet() {
-		return wallet;
-	}
-
-	private AEPrivateKey privKey;
+	private HashMap<String, AEPrivateKey> privKeys = new HashMap<String, AEPrivateKey>();
 
 	public Client(String walletDir) throws Exception {
 		this.wallet = ClaimWallet.getInstance(walletDir);
@@ -42,7 +38,7 @@ public class Client {
 		Element r = conKeyGen.genRandomID();
 		AEPrivateKey tmpPriv = conKeyGen.getTmpPrivKey(r);
 
-		this.privKey = tmpPriv;
+		this.privKeys.put(claimName, tmpPriv);
 
 		Element val = conKeyGen.getTmpPubKey(r);
 
@@ -56,7 +52,7 @@ public class Client {
 
 		IdentityClaim claim = this.wallet.getClaim(claimName);
 
-		AEPrivateKey tmpPriv = this.privKey;
+		AEPrivateKey tmpPriv = this.privKeys.get(claimName);
 
 		AEParameters params = claim.getDefinition().getParams();
 		AECipherTextBlock ct = new AECipherTextBlock(ctOn, params.getPairing());
