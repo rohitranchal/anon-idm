@@ -61,7 +61,9 @@ public class Client {
 		decrypt.init(params);
 		Element result = decrypt.doDecrypt(ct, tmpPriv);
 
-		return new String(Base64.encode(result.toBytes()));
+		String sk = new String(Base64.encode(result.toBytes()));
+		sk = sk.replaceAll(" ", "");
+		return sk;
 	}
 	
 	public String extractSessionKeyDouble(String claimName1, String claimName2, String ch1, String ch2) throws Exception {
@@ -91,7 +93,9 @@ public class Client {
 
 		Element result = result1.add(result2);
 		
-		return new String(Base64.encode(result.toBytes()));
+		String sk = new String(Base64.encode(result.toBytes()));
+		sk = sk.replaceAll(" ", "");
+		return sk;
 	}
 	
 }

@@ -44,7 +44,9 @@ public class ServiceProvider {
 		ObjectNode on = (ObjectNode) rootNode;
 
 		on.put(idClaimDef.getName(), ct.serializeJSON());
-		on.put("SessionKey", new String(Base64.encode(sessionKey.toBytes())));
+		String sk = new String(Base64.encode(sessionKey.toBytes()));
+		sk = sk.replaceAll(" ", "");
+		on.put("SessionKey", sk);
 
 		return on.toString();
 
@@ -95,7 +97,9 @@ public class ServiceProvider {
 
 		on.put(idClaimDef1.getName(), ct1.serializeJSON());
 		on.put(idClaimDef2.getName(), ct2.serializeJSON());
-		on.put("SessionKey", new String(Base64.encode(sessionKey.toBytes())));
+		String sk = new String(Base64.encode(sessionKey.toBytes()));
+		sk = sk.replaceAll(" ", "");
+		on.put("SessionKey", sk);
 
 		return on.toString();
 
