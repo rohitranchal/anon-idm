@@ -63,4 +63,35 @@ public class Client {
 
 		return new String(Base64.encode(result.toBytes()));
 	}
+	
+	public String extractSessionKeyDouble(String claimName1, String claimName2, String ch1, String ch2) throws Exception {
+
+		ObjectMapper mapper = new ObjectMapper();
+		ObjectNode ct1On = (ObjectNode) mapper.readTree(ch1);
+		ObjectNode ct2On = (ObjectNode) mapper.readTree(ch2);
+
+		IdentityClaim claim1 = this.wallet.getClaim(claimName1);
+		AEPrivateKey tmpPriv1 = this.privKeys.get(claimName1);
+
+		AEParameters params1 = claim1.getDefinition().getParams();
+		AECipherTextBlock ct1 = new AECipherTextBlock(ct1On, params1.getPairing());
+
+		Decrypt decrypt = new Decrypt();
+		decrypt.init(params1);
+		Element result1 = decrypt.doDecrypt(ct1, tmpPriv1);
+		
+		IdentityClaim claim2 = this.wallet.getClaim(claimName2);
+		AEPrivateKey tmpPriv2 = this.privKeys.get(claimName2);
+		
+		AEParameters params2 = claim2.getDefinition().getParams();
+		AECipherTextBlock ct2 = new AECipherTextBlock(ct2On, params2.getPairing());
+
+		decrypt.init(params2);
+		Element result2 = decrypt.doDecrypt(ct2, tmpPriv2);
+
+		Element result = result1.add(result2);
+		
+		return new String(Base64.encode(result.toBytes()));
+	}
+	
 }
