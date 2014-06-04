@@ -104,7 +104,7 @@ public class Database {
 			AEParameters params = new AEParameters(paramsOn);
 			
 			Element mkElem = params.getPairing().getG1().newElement();
-			mkElem.setFromBytes(mk.getBytes());
+			mkElem.setFromBytes(Base64.decode(mk.getBytes()));
 			
 			IdentityClaimDefinition claimDef = new IdentityClaimDefinition(name, params, mkElem);
 			claimDef.setDescription(desc);

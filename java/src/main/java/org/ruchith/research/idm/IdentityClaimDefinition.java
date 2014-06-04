@@ -131,7 +131,9 @@ public class IdentityClaimDefinition {
 		on.put("dgst", this.b64Hash);
 		on.put("sig", this.b64Sig);
 		try {
-			on.put("cert", new String(Base64.encode(this.cert.getEncoded())));
+			if(this.cert != null) {
+				on.put("cert", new String(Base64.encode(this.cert.getEncoded())));
+			}
 		} catch (CertificateEncodingException e) {
 			throw new RuntimeException(e);
 		}

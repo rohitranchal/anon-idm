@@ -76,11 +76,11 @@ public class BasicIdentityProviderConnection implements IdentityProviderConnecti
 			Iterator<JsonNode> elements = an.getElements();
 			while (elements.hasNext()) {
 				ObjectNode node = (ObjectNode) elements.next();
-				String name = node.get("Name").asText();
-				String params = node.get("PublicParams").asText();
-				String b64Dgst = node.get("Digest").asText();
-				String b64Sig = node.get("Sig").asText();
-				String b64Cert = node.get("Cert").asText();
+				String name = node.get("name").asText();
+				String params = node.get("params").asText();
+				String b64Dgst = node.get("dgst").asText();
+				String b64Sig = node.get("sig").asText();
+				String b64Cert = node.get("cert").asText();
 				// String createDate = node.get("DateCreated").asText();
 
 				ObjectNode on = (ObjectNode) mapper.readTree(Base64.decode(params));
