@@ -2,6 +2,7 @@ package org.ruchith.research.idm.user;
 
 import it.unisa.dia.gas.jpbc.Element;
 
+import org.bouncycastle.util.encoders.Base64;
 import org.ruchith.ae.base.AEParameters;
 import org.ruchith.research.idm.IdentityClaim;
 import org.ruchith.research.idm.IdentityClaimDefinition;
@@ -31,7 +32,7 @@ public class Client {
 		Element e2 = params.getH2().powZn(r);
 		
 		Element val = e1.mul(e2);
-		
-		return val.toString();
+
+		return new String(Base64.encode(val.toBytes()));
 	}
 }

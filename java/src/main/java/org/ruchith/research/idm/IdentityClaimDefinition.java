@@ -55,7 +55,7 @@ public class IdentityClaimDefinition {
 
 	public IdentityClaimDefinition(ObjectNode on) {
 		this.name = on.get("name").getTextValue();
-		this.description = on.get("desc").getTextValue();
+		this.description = on.get("description").getTextValue();
 		this.b64Hash = on.get("dgst").getTextValue();
 		this.b64Sig = on.get("sig").getTextValue();
 		this.params = new AEParameters((ObjectNode)on.get("params"));
@@ -127,7 +127,7 @@ public class IdentityClaimDefinition {
 
 		on.put("name", this.name);
 		on.put("params", this.params.serializeJSON());
-		on.put("desc", this.description);
+		on.put("description", this.description);
 		on.put("dgst", this.b64Hash);
 		on.put("sig", this.b64Sig);
 		try {
