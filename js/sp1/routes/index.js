@@ -1,10 +1,9 @@
 var fs = require('fs');
-var uuid = require('node-uuid');
 
 var files = fs.readdirSync('./claim_defs/');
 var claim_defs = new Array();
 var claim_def_student = null;
-var claim_def_prof = null;
+var claim_def_cand = null;
 
 for(var i = 0; i < files.length; i++) {
 	fs.readFile('./claim_defs/' + files[i], 'utf8', function(err, data) {
@@ -13,7 +12,7 @@ for(var i = 0; i < files.length; i++) {
 		if(name == 'student') {
 			claim_def_student = data;
 		} else {
-			claim_def_prof = data;
+			claim_def_cand = data;
 		}
 	});
 }
@@ -53,17 +52,36 @@ var sessions = new Array();
 exports.authenticate = function(req, res) {
 	var user_req = req.body.request;
 
-	// var session_key = uuid.v4();
-
 	//Encrypt session key
 	sp.createChallange(user_req, claim_def_student, function(err, val){
 		val = JSON.parse(val);
 		console.log(val.SessionKey);
 		sessions[sessions.length] = val.SessionKey;
-		res.send(val.EncryptedKey);
+		res.send(val.student);
 		if(typeof err != 'undefined') {
 			console.log(err);
 		}
+	});
+};
+
+exports.authenticate_two_claims = function(req, res) {
+	var user_req1 = req.body.request1;
+	var user_req2 = req.body.request2;
+
+	//Encrypt session key
+	sp.createChallangeTwoClaims(user_req1, user_req2, claim_def_student, claim_def_cand, function(err, val){
+		if(typeof err != 'undefined') {
+			console.log(err);
+		}
+		console.log(val);
+		val = JSON.parse(val);
+		console.log(val.SessionKey);
+		sessions[sessions.length] = val.SessionKey;
+		var result = {};
+		result.student = val.student;
+		result.candidate = val.candidate;
+		res.send(result);
+
 	});
 };
 
