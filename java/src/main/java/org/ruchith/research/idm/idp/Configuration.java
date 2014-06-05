@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.Properties;
 
+import org.apache.commons.io.FileUtils;
+
 /**
  * Identity provider configuration data.
  * 
@@ -26,16 +28,16 @@ public class Configuration {
 	private String dbHost;
 
 	private String configDirPath;
+	private byte[] paramFileContents;
 
 	/**
 	 * Read configuration file and populate properties.
 	 * 
 	 * @throws RuntimeException
 	 */
-	private Configuration(String configPath) throws RuntimeException {
+	private Configuration(String configPath) throws Exception {
 		this.configDirPath = configPath;
-		String configFilePath = this.configDirPath + File.separator
-				+ IDPConstants.CONFIG_FILE;
+		String configFilePath = this.configDirPath + File.separator + IDPConstants.CONFIG_FILE;
 
 		// check whether the configuration file exists
 		if (!new File(configFilePath).exists()) {
@@ -59,6 +61,10 @@ public class Configuration {
 		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}
+
+		this.paramFileContents = FileUtils
+				.readFileToByteArray(new File(this.configDirPath + File.separator + "params"));
+
 	}
 
 	/**
@@ -66,7 +72,7 @@ public class Configuration {
 	 * 
 	 * @return Populated {@link Configuration} instance.
 	 */
-	public static Configuration getInstance(String configPath) {
+	public static Configuration getInstance(String configPath) throws Exception {
 		if (config == null) {
 			config = new Configuration(configPath);
 		}
@@ -117,6 +123,10 @@ public class Configuration {
 
 	public String getDbHost() {
 		return dbHost;
+	}
+
+	public byte[] getParamFileContents() {
+		return paramFileContents;
 	}
 
 }

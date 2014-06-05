@@ -35,7 +35,7 @@ public class IdentityManager {
 	 * RSA private key used for signing
 	 */
 	private PrivateKey privKey;
-	
+
 	/**
 	 * Public key certificate of the identity provider.
 	 */
@@ -68,7 +68,8 @@ public class IdentityManager {
 	 * @return An instance of {@link IdentityClaimDefinition} which holds the public parameters and the master key.
 	 */
 	public IdentityClaimDefinition generateNewClaimDefinition(String name, String desc) throws Exception {
-		CurveParams curveParams = (CurveParams) new TypeA1CurveGenerator(4, 32).generate();
+		// CurveParams curveParams = (CurveParams) new TypeA1CurveGenerator(4, 32).generate();
+		CurveParams curveParams = new CurveParams().load(new ByteArrayInputStream(this.config.getParamFileContents()));
 		AEParameterGenerator paramGen = new AEParameterGenerator();
 		paramGen.init(curveParams);
 		AEParameters params = paramGen.generateParameters();
@@ -95,12 +96,12 @@ public class IdentityManager {
 		sig.update(contentBytes);
 		byte[] sigBytes = sig.sign();
 		claimDef.setB64Sig(new String(Base64.encode(sigBytes)));
-		
-		//Set the pub key cert of the idp
+
+		// Set the pub key cert of the idp
 		claimDef.setCert(this.cert);
 
 		this.db.storeClaimDefinition(claimDef);
-		
+
 		return claimDef;
 	}
 
@@ -222,8 +223,7 @@ public class IdentityManager {
 	public Certificate getUserCertificate(String certFpr) throws Exception {
 		String b64Cert = this.db.getUserCertValueByFpr(certFpr);
 		ByteArrayInputStream bais = new ByteArrayInputStream(Base64.decode(b64Cert));
-		return CertificateFactory.getInstance("X.509")
-				.generateCertificate(bais);
+		return CertificateFactory.getInstance("X.509").generateCertificate(bais);
 	}
 
 }

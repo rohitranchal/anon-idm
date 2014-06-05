@@ -5,6 +5,7 @@ import it.unisa.dia.gas.jpbc.Element;
 import org.bouncycastle.util.encoders.Base64;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.ObjectNode;
 import org.ruchith.ae.base.AECipherTextBlock;
 import org.ruchith.ae.base.Encrypt;
