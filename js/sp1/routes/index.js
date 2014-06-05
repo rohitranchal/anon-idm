@@ -1,4 +1,5 @@
 var fs = require('fs');
+var uuid = require('node-uuid');
 
 var files = fs.readdirSync('./claim_defs/');
 var claim_defs = new Array();
@@ -88,6 +89,12 @@ exports.authenticate_two_claims = function(req, res) {
 		res.send(result);
 
 	});
+};
+
+exports.auth_empty = function(req, res) {
+	last_session = uuid.v4();
+	sessions[sessions.length] = last_session;
+	res.send(last_session);
 };
 
 exports.operation = function(req, res) {
