@@ -32,7 +32,7 @@ client.generateRequest('student', function(err, val1){
 		//Make request to authenticate
 		request.post('http://localhost:8001/authenticate_two_claims', {form:{request1:val1, request2:val2}}, function (error, response, body) {
 			if (!error && response.statusCode == 200) {
-				
+
 				var challenge = JSON.parse(body);
 
 				client.extractSessionKeyDouble('student', 'candidate', JSON.stringify(challenge.student), JSON.stringify(challenge.candidate), function(err, sk){
