@@ -99,12 +99,12 @@ exports.authenticate_two_claims = function(req, res) {
 
 exports.authenticate_n_claims = function(req, res) {
 	var user_req = req.body.request;
-	var claim_count = req.body.claims;
 
-	claim_defs = JSON.stringify(claim_defs.slice(0, claim_count));
+	var tmp_cd = JSON.stringify(claim_defs);
+	user_req = JSON.stringify(user_req);
 
 	//Encrypt session key
-	sp.createChallangeNClaims(user_req, claim_defs, function(err, val){
+	sp.createChallangeNClaims(user_req, tmp_cd, function(err, val){
 		if(typeof err != 'undefined') {
 			console.log(err);
 		}
@@ -114,7 +114,7 @@ exports.authenticate_n_claims = function(req, res) {
 
 		sessions[sessions.length] = session_key;
 		last_session = session_key;
-		
+
 		delete val.SessionKey;
 
 		res.send(val);
