@@ -10,7 +10,7 @@ connection.connect();
 
 exports.getAllClaimDefs = function(cb) {
 	
-	connection.query('SELECT  Name as name, Description as desciption, PublicParams as params, Digest as dgst, Sig as sig, Cert as cert, DateCreated FROM Claim_Definition', function(err, rows, fields) {
+	connection.query('SELECT  Name as name, Description as description, PublicParams as params, Digest as dgst, Sig as sig, Cert as cert, DateCreated FROM Claim_Definition', function(err, rows, fields) {
 	  if (err) throw err;
 	  cb(rows);
 	});
@@ -20,7 +20,7 @@ exports.getAllClaimDefs = function(cb) {
 
 exports.getClaimDetails = function(name, cb) {
 
-	connection.query("SELECT Name as name, Description as desciption, PublicParams as params, Digest as dgst, Sig as sig, Cert as cert, DateCreated FROM Claim_Definition WHERE Name='" + name + "'", function(err, rows, fields) {
+	connection.query("SELECT Name as name, Description as description, PublicParams as params, Digest as dgst, Sig as sig, Cert as cert, DateCreated FROM Claim_Definition WHERE Name='" + name + "'", function(err, rows, fields) {
 		if (err) throw err;
 		cb(rows[0]);
 	});
