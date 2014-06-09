@@ -8,12 +8,15 @@ var claim_def_cand = null;
 
 for(var i = 0; i < files.length; i++) {
 	fs.readFile('./claim_defs/' + files[i], 'utf8', function(err, data) {
-		claim_defs[claim_defs.length] = data;
+
 		var name = JSON.parse(data).name;
 		if(name == 'student') {
 			claim_def_student = data;
-		} else {
+		} else if(name == 'candidate') {
 			claim_def_cand = data;
+		} else {
+			var index = name.substring(5);
+			claim_defs[index] = data;
 		}
 	});
 }
@@ -90,6 +93,32 @@ exports.authenticate_two_claims = function(req, res) {
 
 	});
 };
+
+exports.authenticate_n_claims = function(req, res) {
+	var user_req = req.body.request;
+	var claim_count = req.body.claims;
+
+	claim_defs = JSON.stringify(claim_defs.slice(0, claim_count));
+
+	//Encrypt session key
+	sp.createChallangeNClaims(user_req, claim_defs, function(err, val){
+		if(typeof err != 'undefined') {
+			console.log(err);
+		}
+		val = JSON.parse(val);
+
+		var session_key = val.SessionKey;
+
+		sessions[sessions.length] = session_key;
+		last_session = session_key;
+		var result = {};
+		result.student = val.student;
+		result.candidate = val.candidate;
+		res.send(result);
+
+	});
+};
+
 
 exports.auth_empty = function(req, res) {
 	last_session = uuid.v4();
