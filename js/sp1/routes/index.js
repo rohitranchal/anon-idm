@@ -22,7 +22,10 @@ for(var i = 0; i < files.length; i++) {
 }
 
 
-var jars_dir = "/Users/ruchith/Documents/research/anon_idm/source/java/target/";
+
+var jars_dir = fs.readFileSync('jars_dir', 'utf8');
+
+console.log('Loading Java Libraries From : ' + jars_dir);
 
 var java = require("java");
 java.classpath.push(jars_dir + "lib/base-0.1.jar");
@@ -111,10 +114,10 @@ exports.authenticate_n_claims = function(req, res) {
 
 		sessions[sessions.length] = session_key;
 		last_session = session_key;
-		var result = {};
-		result.student = val.student;
-		result.candidate = val.candidate;
-		res.send(result);
+		
+		delete val.SessionKey;
+
+		res.send(val);
 
 	});
 };

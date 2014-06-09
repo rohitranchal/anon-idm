@@ -32,6 +32,7 @@ app.get('/', routes.index);
 app.get('/users', user.list);
 app.post('/authenticate', routes.authenticate);
 app.post('/authenticate_two_claims', routes.authenticate_two_claims);
+app.post('/authenticate_n_claims', routes.authenticate_n_claims);
 app.post('/operation', routes.operation);
 app.post('/auth_empty', routes.auth_empty);
 
