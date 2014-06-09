@@ -23,7 +23,7 @@ for(var i = 0; i < files.length; i++) {
 
 
 
-var jars_dir = fs.readFileSync('jars_dir', 'utf8');
+var jars_dir = fs.readFileSync('jars_dir', 'utf8').trim();
 
 console.log('Loading Java Libraries From : ' + jars_dir);
 
