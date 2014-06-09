@@ -195,7 +195,6 @@ public class BasicIdentityProviderConnection implements IdentityProviderConnecti
 
 		IdentityClaim issuedClaim = this.requestClaim(claim, privKey, i1, user);
 		issuedClaim.setClaimKey(i1); //Add the claim key value
-		
 
 		return issuedClaim;
 	}

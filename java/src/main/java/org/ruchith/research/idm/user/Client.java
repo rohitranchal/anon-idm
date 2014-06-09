@@ -42,7 +42,21 @@ public class Client {
 
 		Element val = conKeyGen.getTmpPubKey(r);
 
-		return new String(Base64.encode(val.toBytes()));
+		byte[] bytes = val.toBytes();
+		return new String(Base64.encode(bytes));
+	}
+
+	public String generateNRequests(int n) throws Exception {
+
+		String retVal = "";
+		for (int i = 0; i < n; i++) {
+			String req = this.generateRequest("claim" + i);
+			if (i > 0) {
+				retVal += ",";
+			}
+			retVal += req;
+		}
+		return retVal;
 	}
 
 	public String extractSessionKey(String claimName, String spResponse) throws Exception {
@@ -65,8 +79,9 @@ public class Client {
 		sk = sk.replaceAll(" ", "");
 		return sk;
 	}
-	
-	public String extractSessionKeyDouble(String claimName1, String claimName2, String ch1, String ch2) throws Exception {
+
+	public String extractSessionKeyDouble(String claimName1, String claimName2, String ch1, String ch2)
+			throws Exception {
 
 		ObjectMapper mapper = new ObjectMapper();
 		ObjectNode ct1On = (ObjectNode) mapper.readTree(ch1);
@@ -81,10 +96,10 @@ public class Client {
 		Decrypt decrypt = new Decrypt();
 		decrypt.init(params1);
 		Element result1 = decrypt.doDecrypt(ct1, tmpPriv1);
-		
+
 		IdentityClaim claim2 = this.wallet.getClaim(claimName2);
 		AEPrivateKey tmpPriv2 = this.privKeys.get(claimName2);
-		
+
 		AEParameters params2 = claim2.getDefinition().getParams();
 		AECipherTextBlock ct2 = new AECipherTextBlock(ct2On, params2.getPairing());
 
@@ -92,10 +107,42 @@ public class Client {
 		Element result2 = decrypt.doDecrypt(ct2, tmpPriv2);
 
 		Element result = result1.add(result2);
-		
+
 		String sk = new String(Base64.encode(result.toBytes()));
 		sk = sk.replaceAll(" ", "");
 		return sk;
 	}
-	
+
+	public String extractSessionKeyN(int n, String ch) throws Exception {
+
+		ObjectMapper mapper = new ObjectMapper();
+		ObjectNode cts = (ObjectNode) mapper.readTree(ch);
+
+		Decrypt decrypt = new Decrypt();
+
+		Element res = null;
+		for (int i = 0; i < n; i++) {
+			String claimName = "claim" + i;
+			ObjectNode ctOn = (ObjectNode) cts.get(claimName);
+			IdentityClaim claim = this.wallet.getClaim(claimName);
+			AEPrivateKey tmpPriv = this.privKeys.get(claimName);
+
+			AEParameters params = claim.getDefinition().getParams();
+			AECipherTextBlock ct = new AECipherTextBlock(ctOn, params.getPairing());
+			decrypt.init(params);
+			Element tmpRes = decrypt.doDecrypt(ct, tmpPriv);
+			// System.out.println("Part : " + i + " : " + tmpRes);
+			if (res == null) {
+				res = tmpRes;
+			} else {
+				res = res.add(tmpRes);
+			}
+		}
+		// System.out.println("Final: " + res);
+		String sk = new String(Base64.encode(res.toBytes()));
+		sk = sk.replaceAll(" ", "");
+		// System.out.println("Returned : "+ sk);
+		return sk;
+	}
+
 }

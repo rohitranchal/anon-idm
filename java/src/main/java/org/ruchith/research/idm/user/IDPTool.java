@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.security.Key;
 import java.security.KeyStore;
 import java.security.PrivateKey;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
@@ -127,13 +128,13 @@ public class IDPTool {
 				ks.load(is, storePass.toCharArray());
 				Key key = ks.getKey(alias, keyPass.toCharArray());
 				
+				long t1 = new Date().getTime();
 				IdentityClaimDefinition claimDef = claimDefs.get(claimName);				
 				IdentityClaim issuedClaim = conn.requestClaim(claimDef, (PrivateKey) key, user);
-
-				System.out.println(issuedClaim.serializeJSON());
 				
 				claimWallet.storeClaim(issuedClaim);
-
+				long t2 = new Date().getTime();
+				System.out.println(t2-t1);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

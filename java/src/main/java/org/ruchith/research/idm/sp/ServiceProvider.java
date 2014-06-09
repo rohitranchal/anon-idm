@@ -119,49 +119,65 @@ public class ServiceProvider {
 	 * @return
 	 * @throws Exception
 	 */
-	public String createChallangeNClaims(String request, String claimDefs) throws Exception {
+	public String createChallangeNClaims(String requests, String claimDefs) throws Exception {
 		ObjectMapper mapper = new ObjectMapper();
+
+		// System.out.println(requests);
+		String[] split = requests.split(",");
 		ArrayNode claimDefNodes = (ArrayNode) mapper.readTree(claimDefs);
-		int size = claimDefNodes.size();
+
 		ArrayList<IdentityClaimDefinition> icds = new ArrayList<IdentityClaimDefinition>();
-		for (int i = 0; i < size; i++) {
-			ObjectNode claimDefOn = (ObjectNode) claimDefNodes.get(i);
+		ArrayList<Element> reqs = new ArrayList<Element>();
+
+		for (int i = 0; i < split.length; i++) {
+			String onVal = claimDefNodes.get(i).getTextValue();
+			ObjectNode claimDefOn = (ObjectNode) mapper.readTree(onVal);
 			IdentityClaimDefinition idClaimDef = new IdentityClaimDefinition(claimDefOn);
 			icds.add(idClaimDef);
+
+			Pairing pairing = idClaimDef.getParams().getPairing();
+			// System.out.println(idClaimDef.serializeJSON());
+			String tmpReq = split[i].replaceAll("\"", "");
+
+			byte[] reqElemBytes = Base64.decode(tmpReq);
+			// System.out.println(reqElemBytes.length);
+			Element reqElem = pairing.getG1().newElement();
+			reqElem.setFromBytes(reqElemBytes);
+			// System.out.println(reqElem.getImmutable());
+
+			reqs.add(reqElem);
 		}
+
 		Pairing pairing = icds.get(0).getParams().getPairing();
-		Field g1 = pairing.getG1();
-
-		byte[] reqElemBytes = Base64.decode(request);
-		Element reqElem = g1.newElement();
-		reqElem.setFromBytes(reqElemBytes);
-
 		Field gt = pairing.getGT();
 		Element sessionKey = gt.newRandomElement().getImmutable();
+		Element sessionKeyOrig = sessionKey.getImmutable();
+		// System.out.println("Key: " + sessionKey);
 
 		Encrypt encrypt = new Encrypt();
 		JsonNode rootNode = mapper.createObjectNode();
 		ObjectNode on = (ObjectNode) rootNode;
 
-		for (int i = 0; i < size; i++) {
+		for (int i = 0; i < split.length; i++) {
 			IdentityClaimDefinition claimDef = icds.get(i);
 
 			Element share = null;
-			if (i < (size - 1)) {
+			if (i < (split.length - 1)) {
 				share = gt.newRandomElement().getImmutable();
-				sessionKey = sessionKey.sub(share);
+				sessionKey = sessionKey.sub(share).getImmutable();
 			} else {
 				// Last one should be the remaining part of session key
 				share = sessionKey;
 			}
 
 			encrypt.init(claimDef.getParams());
-			AECipherTextBlock ct = encrypt.doEncrypt(share, reqElem);
+			// System.out.println("Part : " + i + " : " + share);
+			AECipherTextBlock ct = encrypt.doEncrypt(share, reqs.get(i));
 
 			on.put(claimDef.getName(), ct.serializeJSON());
 		}
 
-		String sk = new String(Base64.encode(sessionKey.toBytes()));
+		String sk = new String(Base64.encode(sessionKeyOrig.toBytes()));
 		sk = sk.replaceAll(" ", "");
 		on.put("SessionKey", sk);
 		return on.toString();
