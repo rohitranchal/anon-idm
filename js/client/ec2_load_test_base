@@ -1,0 +1,1 @@
+for i in {1..101}; do node ec2_run_base.js ; done

@@ -25,13 +25,15 @@ java.classpath.push(jars_dir + "idp-1.0-SNAPSHOT.jar");
 var Client = java.import('org.ruchith.research.idm.user.Client');
 var client = new Client(wallet_dir);
 
-var n = 50;
+console.log(process.argv[2]);
+
+var n = parseInt(process.argv[2]);
 
 
-
+var start = new Date().getTime();
 client.generateNRequests(n, function(err, val){
 
-	request.post('http://localhost:8001/authenticate_n_claims', {form:{request:val}}, function (error, response, body) {
+	request.post('http://ec2-54-82-231-14.compute-1.amazonaws.com:8001/authenticate_n_claims', {form:{request:val}}, function (error, response, body) {
 		if (!error && response.statusCode == 200) {
 
 			client.extractSessionKeyN(n, body, function(err, sk){
@@ -39,8 +41,10 @@ client.generateNRequests(n, function(err, val){
 					console.log(err);
 				} else {
 					//Make request to operation
-					request.post('http://localhost:8001/operation', {form:{session_key:sk}}, function (error2, response2, body2) {
-						console.log(body2);
+					request.post('http://ec2-54-82-231-14.compute-1.amazonaws.com:8001/operation', {form:{session_key:sk}}, function (error2, response2, body2) {
+						var end = new Date().getTime();
+
+						console.log(body2 + ' : ' + (end - start));
 					});
 				}
 			});
