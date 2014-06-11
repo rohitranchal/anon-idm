@@ -1,6 +1,9 @@
 package org.ruchith.research.idm.user;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import it.unisa.dia.gas.jpbc.Element;
 
@@ -12,6 +15,7 @@ import org.ruchith.ae.base.AEParameters;
 import org.ruchith.ae.base.AEPrivateKey;
 import org.ruchith.ae.base.ContactKeyGen;
 import org.ruchith.ae.base.Decrypt;
+import org.ruchith.ae.base.Encrypt;
 import org.ruchith.research.idm.IdentityClaim;
 import org.ruchith.research.idm.IdentityClaimDefinition;
 
@@ -143,6 +147,83 @@ public class Client {
 		sk = sk.replaceAll(" ", "");
 		// System.out.println("Returned : "+ sk);
 		return sk;
+	}
+
+	public String extractSessionKeyNThreads(int n, String ch) throws Exception {
+
+		ObjectMapper mapper = new ObjectMapper();
+		ObjectNode cts = (ObjectNode) mapper.readTree(ch);
+
+		ArrayList<DecrypterThread> dts = new ArrayList<Client.DecrypterThread>();
+		// HashMap<String, Element> results = new HashMap<String, Element>();
+
+		Element res = this.wallet.getClaim("claim0").getDefinition().getParams().getPairing().getGT().newOneElement();
+		for (int i = 0; i < n; i++) {
+			String claimName = "claim" + i;
+			ObjectNode ctOn = (ObjectNode) cts.get(claimName);
+			IdentityClaim claim = this.wallet.getClaim(claimName);
+			AEPrivateKey tmpPriv = this.privKeys.get(claimName);
+
+			AEParameters params = claim.getDefinition().getParams();
+			AECipherTextBlock ct = new AECipherTextBlock(ctOn, params.getPairing());
+
+			DecrypterThread dt = new DecrypterThread(claimName, params, ct, tmpPriv, res);
+			dt.start();
+			dts.add(dt);
+		}
+
+		for (DecrypterThread dt : dts) {
+			dt.join();
+		}
+
+		// Collection<Element> values = results.values();
+		// Element res = null;
+		// for (Iterator iterator = values.iterator(); iterator.hasNext();) {
+		// System.out.println();
+		// Element element = (Element) iterator.next();
+		// if(res == null) {
+		// res = element;
+		// } else {
+		// res = res.add(element);
+		// }
+		// }
+
+		// System.out.println("Final: " + res);
+		String sk = new String(Base64.encode(res.toBytes()));
+		sk = sk.replaceAll(" ", "");
+		// System.out.println("Returned : "+ sk);
+		return sk;
+	}
+
+	class DecrypterThread extends Thread {
+
+		private AEParameters params;
+		private AECipherTextBlock ct;
+		private AEPrivateKey tmpPriv;
+		// private HashMap<String, Element> results;
+		private Element res;
+		private String claimName;
+
+		// public DecrypterThread(String claimName, AEParameters params, AECipherTextBlock ct, AEPrivateKey tmpPriv,
+		// HashMap<String, Element> res) {
+		public DecrypterThread(String claimName, AEParameters params, AECipherTextBlock ct, AEPrivateKey tmpPriv,
+				Element res) {
+			this.params = params;
+			this.ct = ct;
+			this.tmpPriv = tmpPriv;
+			// this.results = res;
+			this.res = res;
+			this.claimName = claimName;
+		}
+
+		public void run() {
+			Decrypt d = new Decrypt();
+			d.init(this.params);
+			Element tmpRes = d.doDecrypt(this.ct, this.tmpPriv);
+			// this.results.put(this.claimName, tmpRes);
+			this.res.add(tmpRes);
+		}
+
 	}
 
 }
