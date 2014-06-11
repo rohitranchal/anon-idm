@@ -128,7 +128,7 @@ public class ServiceProvider {
 
 		ArrayList<IdentityClaimDefinition> icds = new ArrayList<IdentityClaimDefinition>();
 		ArrayList<Element> reqs = new ArrayList<Element>();
-
+		
 		for (int i = 0; i < split.length; i++) {
 			String onVal = claimDefNodes.get(i).getTextValue();
 			ObjectNode claimDefOn = (ObjectNode) mapper.readTree(onVal);
@@ -153,7 +153,7 @@ public class ServiceProvider {
 		Element sessionKey = gt.newRandomElement().getImmutable();
 		Element sessionKeyOrig = sessionKey.getImmutable();
 		// System.out.println("Key: " + sessionKey);
-
+		
 		Encrypt encrypt = new Encrypt();
 		JsonNode rootNode = mapper.createObjectNode();
 		ObjectNode on = (ObjectNode) rootNode;
@@ -183,4 +183,107 @@ public class ServiceProvider {
 		return on.toString();
 	}
 
+	
+	/**
+	 * 
+	 * @param request
+	 * @param claimDefs
+	 *            Array of claim defs
+	 * @return
+	 * @throws Exception
+	 */
+	public String createChallangeNClaimsThreads(String requests, String claimDefs) throws Exception {
+		ObjectMapper mapper = new ObjectMapper();
+
+		// System.out.println(requests);
+		String[] split = requests.split(",");
+		ArrayNode claimDefNodes = (ArrayNode) mapper.readTree(claimDefs);
+
+		ArrayList<IdentityClaimDefinition> icds = new ArrayList<IdentityClaimDefinition>();
+		ArrayList<Element> reqs = new ArrayList<Element>();
+		
+		for (int i = 0; i < split.length; i++) {
+			String onVal = claimDefNodes.get(i).getTextValue();
+			ObjectNode claimDefOn = (ObjectNode) mapper.readTree(onVal);
+			IdentityClaimDefinition idClaimDef = new IdentityClaimDefinition(claimDefOn);
+			icds.add(idClaimDef);
+
+			Pairing pairing = idClaimDef.getParams().getPairing();
+			// System.out.println(idClaimDef.serializeJSON());
+			String tmpReq = split[i].replaceAll("\"", "");
+
+			byte[] reqElemBytes = Base64.decode(tmpReq);
+			// System.out.println(reqElemBytes.length);
+			Element reqElem = pairing.getG1().newElement();
+			reqElem.setFromBytes(reqElemBytes);
+			// System.out.println(reqElem.getImmutable());
+
+			reqs.add(reqElem);
+		}
+
+		Pairing pairing = icds.get(0).getParams().getPairing();
+		Field gt = pairing.getGT();
+		Element sessionKey = gt.newRandomElement().getImmutable();
+		Element sessionKeyOrig = sessionKey.getImmutable();
+		// System.out.println("Key: " + sessionKey);
+		
+		JsonNode rootNode = mapper.createObjectNode();
+		ObjectNode on = (ObjectNode) rootNode;
+		
+		ArrayList<EncrypterThread> ets = new ArrayList<ServiceProvider.EncrypterThread>();
+
+		for (int i = 0; i < split.length; i++) {
+			IdentityClaimDefinition claimDef = icds.get(i);
+
+			Element share = null;
+			if (i < (split.length - 1)) {
+				share = gt.newRandomElement().getImmutable();
+				sessionKey = sessionKey.sub(share).getImmutable();
+			} else {
+				// Last one should be the remaining part of session key
+				share = sessionKey;
+			}
+			
+			EncrypterThread t = new EncrypterThread(claimDef.getName(), claimDef.getParams(), share, reqs.get(i), on);
+			t.start();
+			ets.add(t);
+		}
+
+		for(EncrypterThread t: ets) {
+			t.join();
+		}
+		
+		String sk = new String(Base64.encode(sessionKeyOrig.toBytes()));
+		sk = sk.replaceAll(" ", "");
+		on.put("SessionKey", sk);
+		return on.toString();
+	}
+
+	
+	class EncrypterThread extends Thread {
+		
+		private AEParameters params;
+		private Element share;
+		private Element req;
+		private ObjectNode on;
+		private String claimName;
+		
+		
+		public EncrypterThread(String claimName, AEParameters params, Element share, Element req, ObjectNode on) {
+			this.claimName = claimName;
+			this.params = params;
+			this.share = share;
+			this.req = req;
+			this.on = on;
+		}
+		
+	    public void run() {
+	    	Encrypt e = new Encrypt();
+	    	e.init(this.params);
+	    	AECipherTextBlock ct = e.doEncrypt(this.share, this.req);
+	    	this.on.put(this.claimName, ct.serializeJSON());
+	    }
+	    
+	}
+	
 }
