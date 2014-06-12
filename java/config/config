@@ -9,5 +9,5 @@ db_password=
 db_name=idp
 db_host=localhost
 
-
+same_h1_and_h2=false
 

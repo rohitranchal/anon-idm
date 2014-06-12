@@ -1,6 +1,7 @@
 package org.ruchith.research.idm.idp;
 
 import it.unisa.dia.gas.jpbc.Element;
+import it.unisa.dia.gas.jpbc.Field;
 import it.unisa.dia.gas.plaf.jpbc.pairing.CurveParams;
 import it.unisa.dia.gas.plaf.jpbc.pairing.a1.TypeA1CurveGenerator;
 
@@ -73,6 +74,17 @@ public class IdentityManager {
 		AEParameterGenerator paramGen = new AEParameterGenerator();
 		paramGen.init(curveParams);
 		AEParameters params = paramGen.generateParameters();
+
+		if (this.config.isUseSameH1AndH2()) {
+			Field g1 = params.getPairing().getG1();
+			Element h1 = g1.newElement();
+			h1.setFromBytes(this.config.getH1());
+			params.setH1(h1.getImmutable());
+
+			Element h2 = g1.newElement();
+			h2.setFromBytes(this.config.getH2());
+			params.setH1(h2.getImmutable());
+		}
 
 		Element mk = paramGen.getMasterKey();
 

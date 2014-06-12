@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
+import org.bouncycastle.util.encoders.Base64;
+
 
 /**
  * Identity provider configuration data.
@@ -26,9 +28,12 @@ public class Configuration {
 	private String dbUser;
 	private String dbPassword;
 	private String dbHost;
+	private boolean useSameH1AndH2;
 
 	private String configDirPath;
 	private byte[] paramFileContents;
+	private byte[] h1;
+	private byte[] h2;
 
 	/**
 	 * Read configuration file and populate properties.
@@ -57,6 +62,7 @@ public class Configuration {
 			this.keystorePassword = prop.getProperty("keystore_password");
 			this.privKeyAlias = prop.getProperty("private_key_alias");
 			this.privKeyPassword = prop.getProperty("private_key_password");
+			this.useSameH1AndH2 = prop.getProperty("same_h1_and_h2").equals("true");
 
 		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage(), e);
@@ -64,6 +70,10 @@ public class Configuration {
 
 		this.paramFileContents = FileUtils
 				.readFileToByteArray(new File(this.configDirPath + File.separator + "params"));
+
+		this.h1 = Base64.decode(FileUtils.readFileToByteArray(new File(this.configDirPath + File.separator + "h1")));
+
+		this.h2 = Base64.decode(FileUtils.readFileToByteArray(new File(this.configDirPath + File.separator + "h2")));
 
 	}
 
@@ -127,6 +137,18 @@ public class Configuration {
 
 	public byte[] getParamFileContents() {
 		return paramFileContents;
+	}
+
+	public boolean isUseSameH1AndH2() {
+		return useSameH1AndH2;
+	}
+
+	public byte[] getH1() {
+		return h1;
+	}
+
+	public byte[] getH2() {
+		return h2;
 	}
 
 }
