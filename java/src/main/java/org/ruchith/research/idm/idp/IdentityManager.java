@@ -21,6 +21,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.bouncycastle.util.encoders.Base64;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.node.ObjectNode;
 import org.ruchith.ae.base.AEParameterGenerator;
 import org.ruchith.ae.base.AEParameters;
 import org.ruchith.ae.base.AEPrivateKey;
@@ -70,10 +72,13 @@ public class IdentityManager {
 	 */
 	public IdentityClaimDefinition generateNewClaimDefinition(String name, String desc) throws Exception {
 		// CurveParams curveParams = (CurveParams) new TypeA1CurveGenerator(4, 32).generate();
-		CurveParams curveParams = new CurveParams().load(new ByteArrayInputStream(this.config.getParamFileContents()));
+//		CurveParams curveParams = new CurveParams().load(new ByteArrayInputStream(this.config.getParamFileContents()));
 		AEParameterGenerator paramGen = new AEParameterGenerator();
-		paramGen.init(curveParams);
-		AEParameters params = paramGen.generateParameters();
+//		paramGen.init(curveParams);
+		ObjectMapper mapper = new ObjectMapper();
+		ObjectNode on = (ObjectNode)mapper.readTree(new String(this.config.getParamFileContents()));
+		AEParameters from = new AEParameters(on);
+		AEParameters params = paramGen.generateParameters(from);
 
 		if (this.config.isUseSameH1AndH2()) {
 			Field g1 = params.getPairing().getG1();
