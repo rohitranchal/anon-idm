@@ -25,7 +25,7 @@ java.classpath.push(jars_dir + "idp-1.0-SNAPSHOT.jar");
 var Client = java.import('org.ruchith.research.idm.user.Client');
 var client = new Client(wallet_dir);
 
-var n = 70;
+var n = 99;
 
 var start = new Date().getTime();
 

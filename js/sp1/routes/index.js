@@ -151,6 +151,34 @@ exports.authenticate_n_claims_t = function(req, res) {
 	});
 };
 
+
+exports.authenticate_a_n_claims = function(req, res) {
+	var user_req = req.body.request;
+	var num = req.body.num;
+
+
+	var tmp_cd = JSON.stringify(claim_a_defs);
+	user_req = JSON.stringify(user_req);
+
+	//Encrypt session key
+	sp.createChallangeNAClaims(user_req, tmp_cd, parseInt(num), function(err, val){
+		if(typeof err != 'undefined') {
+			console.log(err);
+		}
+		val = JSON.parse(val);
+
+		var session_key = val.SessionKey;
+
+		sessions[sessions.length] = session_key;
+		last_session = session_key;
+
+		delete val.SessionKey;
+		res.send(val);
+
+	});
+};
+
+
 exports.authenticate_a_n_claims_t = function(req, res) {
 	var user_req = req.body.request;
 	var num = req.body.num;

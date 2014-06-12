@@ -25,16 +25,15 @@ java.classpath.push(jars_dir + "idp-1.0-SNAPSHOT.jar");
 var Client = java.import('org.ruchith.research.idm.user.Client');
 var client = new Client(wallet_dir);
 
-var n = 99;
+var n = 30;
 
 var start = new Date().getTime();
 
 client.generateANRequests(n, function(err, val){
 
-	request.post('http://localhost:8001/authenticate_a_n_claims_t', {form:{request:val, num:n}}, function (error, response, body) {
+	request.post('http://localhost:8001/authenticate_a_n_claims', {form:{request:val, num:n}}, function (error, response, body) {
 		if (!error && response.statusCode == 200) {
-
-			client.extractSessionKeyNThreadsOneReq(n, body, function(err, sk){
+			client.extractSessionKeyAN(n, body, function(err, sk){
 				if(typeof err != 'undefined') {
 					console.log(err);
 				} else {
