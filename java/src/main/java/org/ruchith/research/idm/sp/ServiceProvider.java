@@ -258,6 +258,73 @@ public class ServiceProvider {
 		return on.toString();
 	}
 
+	
+	public String createChallangeNAClaims(String req, String claimDefs, int size) throws Exception {
+		ObjectMapper mapper = new ObjectMapper();
+		ArrayNode claimDefNodes = (ArrayNode) mapper.readTree(claimDefs);
+
+		req = req.replaceAll("\"", "");
+		byte[] reqElemBytes = Base64.decode(req);
+
+		Element reqElem = null;
+		ArrayList<IdentityClaimDefinition> icds = new ArrayList<IdentityClaimDefinition>();
+
+		for (int i = 0; i < size; i++) {
+			String onVal = claimDefNodes.get(i).getTextValue();
+
+			ObjectNode claimDefOn = (ObjectNode) mapper.readTree(onVal);
+			IdentityClaimDefinition idClaimDef = new IdentityClaimDefinition(claimDefOn);
+			icds.add(idClaimDef);
+
+			if (reqElem == null) {
+				Pairing pairing = idClaimDef.getParams().getPairing();
+				reqElem = pairing.getG1().newElement();
+				reqElem.setFromBytes(reqElemBytes);
+//				System.out.println(reqElem);
+			}
+
+		}
+
+		Pairing pairing = icds.get(0).getParams().getPairing();
+		Field gt = pairing.getGT();
+		Element sessionKey = gt.newRandomElement().getImmutable();
+		Element sessionKeyOrig = sessionKey.getImmutable();
+		// System.out.println("Key: " + sessionKey);
+
+		JsonNode rootNode = mapper.createObjectNode();
+		ObjectNode on = (ObjectNode) rootNode;
+		Encrypt encrypt = new Encrypt();
+		
+
+		for (int i = 0; i < size; i++) {
+			IdentityClaimDefinition claimDef = icds.get(i);
+
+			Element share = null;
+			if (i < (size - 1)) {
+				share = gt.newRandomElement().getImmutable();
+				sessionKey = sessionKey.sub(share).getImmutable();
+			} else {
+				// Last one should be the remaining part of session key
+				share = sessionKey;
+			}
+			
+			
+			encrypt.init(claimDef.getParams());
+			// System.out.println("Part : " + i + " : " + share);
+			AECipherTextBlock ct = encrypt.doEncrypt(share, reqElem);
+
+			on.put(claimDef.getName(), ct.serializeJSON());
+		}
+
+
+//		System.out.println(sessionKeyOrig);
+		String sk = new String(Base64.encode(sessionKeyOrig.toBytes()));
+		sk = sk.replaceAll(" ", "");
+		on.put("SessionKey", sk);
+		return on.toString();
+	}
+
+	
 	public String createChallangeNAClaimsThreads(String req, String claimDefs, int size) throws Exception {
 		ObjectMapper mapper = new ObjectMapper();
 		ArrayNode claimDefNodes = (ArrayNode) mapper.readTree(claimDefs);
@@ -279,7 +346,7 @@ public class ServiceProvider {
 				Pairing pairing = idClaimDef.getParams().getPairing();
 				reqElem = pairing.getG1().newElement();
 				reqElem.setFromBytes(reqElemBytes);
-				System.out.println(reqElem);
+//				System.out.println(reqElem);
 			}
 
 		}
@@ -316,6 +383,7 @@ public class ServiceProvider {
 			t.join();
 		}
 
+//		System.out.println(sessionKeyOrig);
 		String sk = new String(Base64.encode(sessionKeyOrig.toBytes()));
 		sk = sk.replaceAll(" ", "");
 		on.put("SessionKey", sk);

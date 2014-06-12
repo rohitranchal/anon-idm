@@ -1,12 +1,11 @@
 package org.ruchith.research.idm.user;
 
-import java.math.BigInteger;
+import it.unisa.dia.gas.jpbc.Element;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-
-import it.unisa.dia.gas.jpbc.Element;
 
 import org.bouncycastle.util.encoders.Base64;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -16,7 +15,6 @@ import org.ruchith.ae.base.AEParameters;
 import org.ruchith.ae.base.AEPrivateKey;
 import org.ruchith.ae.base.ContactKeyGen;
 import org.ruchith.ae.base.Decrypt;
-import org.ruchith.ae.base.Encrypt;
 import org.ruchith.research.idm.IdentityClaim;
 import org.ruchith.research.idm.IdentityClaimDefinition;
 
@@ -46,16 +44,16 @@ public class Client {
 		this.privKeys.put(claimName, tmpPriv);
 
 		Element val = conKeyGen.getTmpPubKey(r);
-		
-		System.out.println(val);
-		
+
+		// System.out.println(val);
+
 		byte[] bytes = val.toBytes();
 		return new String(Base64.encode(bytes));
 	}
 
 	public String generateRequestGivenR(String claimName, Element r) throws Exception {
 		IdentityClaim claim = wallet.getClaim(claimName);
-		System.out.println("Creating priv key of : " + claimName);
+		// System.out.println("Creating priv key of : " + claimName);
 		IdentityClaimDefinition icd = claim.getDefinition();
 
 		// Create request
@@ -63,7 +61,7 @@ public class Client {
 
 		ContactKeyGen conKeyGen = new ContactKeyGen();
 		Element claimKey = claim.getClaimKey();
-		System.out.println(claimKey);
+		// System.out.println(claimKey);
 		conKeyGen.init(claimKey, claim.getClaim(), params);
 		AEPrivateKey tmpPriv = conKeyGen.getTmpPrivKey(r);
 
@@ -71,7 +69,7 @@ public class Client {
 
 		Element val = conKeyGen.getTmpPubKey(r);
 
-		System.out.println(val);
+		// System.out.println(val);
 		byte[] bytes = val.toBytes();
 		return new String(Base64.encode(bytes));
 	}
@@ -104,7 +102,7 @@ public class Client {
 			// Use the same r
 			lastReq = this.generateRequestGivenR("claim_a_" + i, r);
 		}
-		System.out.println(lastReq);
+		// System.out.println(lastReq);
 		return lastReq;
 	}
 
@@ -172,6 +170,38 @@ public class Client {
 		Element res = null;
 		for (int i = 0; i < n; i++) {
 			String claimName = "claim" + i;
+			ObjectNode ctOn = (ObjectNode) cts.get(claimName);
+			IdentityClaim claim = this.wallet.getClaim(claimName);
+			AEPrivateKey tmpPriv = this.privKeys.get(claimName);
+
+			AEParameters params = claim.getDefinition().getParams();
+			AECipherTextBlock ct = new AECipherTextBlock(ctOn, params.getPairing());
+			decrypt.init(params);
+			Element tmpRes = decrypt.doDecrypt(ct, tmpPriv);
+			// System.out.println("Part : " + i + " : " + tmpRes);
+			if (res == null) {
+				res = tmpRes;
+			} else {
+				res = res.add(tmpRes);
+			}
+		}
+		// System.out.println("Final: " + res);
+		String sk = new String(Base64.encode(res.toBytes()));
+		sk = sk.replaceAll(" ", "");
+		// System.out.println("Returned : "+ sk);
+		return sk;
+	}
+	
+	public String extractSessionKeyAN(int n, String ch) throws Exception {
+
+		ObjectMapper mapper = new ObjectMapper();
+		ObjectNode cts = (ObjectNode) mapper.readTree(ch);
+
+		Decrypt decrypt = new Decrypt();
+
+		Element res = null;
+		for (int i = 0; i < n; i++) {
+			String claimName = "claim_a_" + i;
 			ObjectNode ctOn = (ObjectNode) cts.get(claimName);
 			IdentityClaim claim = this.wallet.getClaim(claimName);
 			AEPrivateKey tmpPriv = this.privKeys.get(claimName);
@@ -276,10 +306,11 @@ public class Client {
 		ObjectMapper mapper = new ObjectMapper();
 		ObjectNode cts = (ObjectNode) mapper.readTree(ch);
 
-		ArrayList<DecrypterThread> dts = new ArrayList<Client.DecrypterThread>();
-		// HashMap<String, Element> results = new HashMap<String, Element>();
+		ArrayList<DecrypterThread2> dts = new ArrayList<Client.DecrypterThread2>();
+		HashMap<String, Element> results = new HashMap<String, Element>();
 
-		Element res = this.wallet.getClaim("claim_a_0").getDefinition().getParams().getPairing().getGT().newOneElement();
+		// Element res =
+		// this.wallet.getClaim("claim_a_0").getDefinition().getParams().getPairing().getGT().newZeroElement();
 		for (int i = 0; i < n; i++) {
 			String claimName = "claim_a_" + i;
 			ObjectNode ctOn = (ObjectNode) cts.get(claimName);
@@ -289,32 +320,58 @@ public class Client {
 			AEParameters params = claim.getDefinition().getParams();
 			AECipherTextBlock ct = new AECipherTextBlock(ctOn, params.getPairing());
 
-			DecrypterThread dt = new DecrypterThread(claimName, params, ct, tmpPriv, res);
+			DecrypterThread2 dt = new DecrypterThread2(claimName, params, ct, tmpPriv, results);
 			dt.start();
 			dts.add(dt);
 		}
 
-		for (DecrypterThread dt : dts) {
+		for (DecrypterThread2 dt : dts) {
 			dt.join();
 		}
 
-		// Collection<Element> values = results.values();
-		// Element res = null;
-		// for (Iterator iterator = values.iterator(); iterator.hasNext();) {
-		// System.out.println();
-		// Element element = (Element) iterator.next();
-		// if(res == null) {
-		// res = element;
-		// } else {
-		// res = res.add(element);
-		// }
-		// }
+		Collection<Element> values = results.values();
+		Element res = null;
+		for (Iterator iterator = values.iterator(); iterator.hasNext();) {
+			Element element = (Element) iterator.next();
+			if (res == null) {
+				res = element;
+			} else {
+				res = res.add(element);
+			}
+		}
 
 		// System.out.println("Final: " + res);
+		System.out.println(res);
 		String sk = new String(Base64.encode(res.toBytes()));
 		sk = sk.replaceAll(" ", "");
 		// System.out.println("Returned : "+ sk);
 		return sk;
+	}
+
+	class DecrypterThread2 extends Thread {
+
+		private AEParameters params;
+		private AECipherTextBlock ct;
+		private AEPrivateKey tmpPriv;
+		private HashMap<String, Element> results;
+		private String claimName;
+
+		public DecrypterThread2(String claimName, AEParameters params, AECipherTextBlock ct, AEPrivateKey tmpPriv,
+				HashMap<String, Element> res) {
+			this.params = params;
+			this.ct = ct;
+			this.tmpPriv = tmpPriv;
+			this.results = res;
+			this.claimName = claimName;
+		}
+
+		public void run() {
+			Decrypt d = new Decrypt();
+			d.init(this.params);
+			Element tmpRes = d.doDecrypt(this.ct, this.tmpPriv);
+			this.results.put(this.claimName, tmpRes);
+		}
+
 	}
 
 }
