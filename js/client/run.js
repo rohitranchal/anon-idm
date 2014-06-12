@@ -5,7 +5,7 @@ var jars_dir = proj_dir + "/target/";
 var wallet_dir = proj_dir + "/scripts/wallet/";
 
 var java = require("java");
-java.classpath.push(jars_dir + "lib/base-0.1.jar");
+java.classpath.push(jars_dir + "lib/base-1.0-SNAPSHOT.jar");
 java.classpath.push(jars_dir + "lib/bcprov-jdk16-1.46.jar");
 java.classpath.push(jars_dir + "lib/commons-io-1.3.2.jar");
 java.classpath.push(jars_dir + "lib/jackson-core-asl-1.9.4.jar");

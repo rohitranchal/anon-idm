@@ -5,7 +5,7 @@ var jars_dir = proj_dir + "/target/";
 var wallet_dir = proj_dir + "/scripts/wallet/";
 
 var java = require("java");
-java.classpath.push(jars_dir + "lib/base-0.1.jar");
+java.classpath.push(jars_dir + "lib/base-1.0-SNAPSHOT.jar");
 java.classpath.push(jars_dir + "lib/bcprov-jdk16-1.46.jar");
 java.classpath.push(jars_dir + "lib/commons-io-1.3.2.jar");
 java.classpath.push(jars_dir + "lib/jackson-core-asl-1.9.4.jar");
@@ -25,9 +25,9 @@ java.classpath.push(jars_dir + "idp-1.0-SNAPSHOT.jar");
 var Client = java.import('org.ruchith.research.idm.user.Client');
 var client = new Client(wallet_dir);
 
-var n = 50;
+var n = 80;
 
-
+var start = new Date().getTime();
 
 client.generateNRequests(n, function(err, val){
 
@@ -40,7 +40,8 @@ client.generateNRequests(n, function(err, val){
 				} else {
 					//Make request to operation
 					request.post('http://localhost:8001/operation', {form:{session_key:sk}}, function (error2, response2, body2) {
-						console.log(body2);
+						var end = new Date().getTime();
+						console.log(body2 + ' : ' + (end - start));
 					});
 				}
 			});

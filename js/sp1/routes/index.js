@@ -28,7 +28,7 @@ var jars_dir = fs.readFileSync('jars_dir', 'utf8').trim();
 console.log('Loading Java Libraries From : ' + jars_dir);
 
 var java = require("java");
-java.classpath.push(jars_dir + "lib/base-0.1.jar");
+java.classpath.push(jars_dir + "lib/base-1.0-SNAPSHOT.jar");
 java.classpath.push(jars_dir + "lib/bcprov-jdk16-1.46.jar");
 java.classpath.push(jars_dir + "lib/jackson-core-asl-1.9.4.jar");
 java.classpath.push(jars_dir + "lib/jackson-jaxrs-1.9.4.jar");
@@ -117,6 +117,30 @@ exports.authenticate_n_claims = function(req, res) {
 
 		delete val.SessionKey;
 
+		res.send(val);
+
+	});
+};
+
+exports.authenticate_n_claims_t = function(req, res) {
+	var user_req = req.body.request;
+
+	var tmp_cd = JSON.stringify(claim_defs);
+	user_req = JSON.stringify(user_req);
+
+	//Encrypt session key
+	sp.createChallangeNClaimsThreads(user_req, tmp_cd, function(err, val){
+		if(typeof err != 'undefined') {
+			console.log(err);
+		}
+		val = JSON.parse(val);
+
+		var session_key = val.SessionKey;
+
+		sessions[sessions.length] = session_key;
+		last_session = session_key;
+
+		delete val.SessionKey;
 		res.send(val);
 
 	});
