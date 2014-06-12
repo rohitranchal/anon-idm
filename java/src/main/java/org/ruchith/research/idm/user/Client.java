@@ -5,6 +5,7 @@ import it.unisa.dia.gas.jpbc.Element;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Iterator;
 
 import org.bouncycastle.util.encoders.Base64;
@@ -22,7 +23,7 @@ public class Client {
 
 	private ClaimWallet wallet;
 
-	private HashMap<String, AEPrivateKey> privKeys = new HashMap<String, AEPrivateKey>();
+	private Hashtable<String, AEPrivateKey> privKeys = new Hashtable<String, AEPrivateKey>();
 
 	public Client(String walletDir) throws Exception {
 		this.wallet = ClaimWallet.getInstance(walletDir);
@@ -101,6 +102,26 @@ public class Client {
 		for (int i = 0; i < n; i++) {
 			// Use the same r
 			lastReq = this.generateRequestGivenR("claim_a_" + i, r);
+		}
+		// System.out.println(lastReq);
+		return lastReq;
+	}
+
+	public String generateANRequestsThreads(int n) throws Exception {
+
+		IdentityClaim claim = wallet.getClaim("claim_a_0");
+
+		IdentityClaimDefinition icd = claim.getDefinition();
+		AEParameters params = icd.getParams();
+		ContactKeyGen conKeyGen = new ContactKeyGen();
+		conKeyGen.init(claim.getClaimKey(), claim.getClaim(), params);
+		Element r = conKeyGen.genRandomID().getImmutable();
+
+		String lastReq = this.generateRequestGivenR("claim_a_0", r);
+		for (int i = 1; i < n; i++) {
+			// Use the same r
+			new PrivKeyCreatorThread("claim_a_" + i, r, this.privKeys).start();
+
 		}
 		// System.out.println(lastReq);
 		return lastReq;
@@ -191,7 +212,7 @@ public class Client {
 		// System.out.println("Returned : "+ sk);
 		return sk;
 	}
-	
+
 	public String extractSessionKeyAN(int n, String ch) throws Exception {
 
 		ObjectMapper mapper = new ObjectMapper();
@@ -370,6 +391,37 @@ public class Client {
 			d.init(this.params);
 			Element tmpRes = d.doDecrypt(this.ct, this.tmpPriv);
 			this.results.put(this.claimName, tmpRes);
+		}
+
+	}
+
+	class PrivKeyCreatorThread extends Thread {
+
+		private String claimName;
+		private Element r;
+		private Hashtable<String, AEPrivateKey> keys;
+
+		public PrivKeyCreatorThread(String claimName, Element r, Hashtable<String, AEPrivateKey> keys) {
+			this.claimName = claimName;
+			this.r = r;
+			this.keys = keys;
+		}
+
+		public void run() {
+			IdentityClaim claim = wallet.getClaim(claimName);
+			// System.out.println("Creating priv key of : " + claimName);
+			IdentityClaimDefinition icd = claim.getDefinition();
+
+			// Create request
+			AEParameters params = icd.getParams();
+
+			ContactKeyGen conKeyGen = new ContactKeyGen();
+			Element claimKey = claim.getClaimKey();
+			// System.out.println(claimKey);
+			conKeyGen.init(claimKey, claim.getClaim(), params);
+			AEPrivateKey tmpPriv = conKeyGen.getTmpPrivKey(r);
+
+			this.keys.put(claimName, tmpPriv);
 		}
 
 	}
