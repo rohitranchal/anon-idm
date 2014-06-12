@@ -25,11 +25,11 @@ import org.ruchith.research.idm.IdentityClaimDefinition;
 public class IDPTool {
 
 	private static ClaimWallet claimWallet;
-	
+
 	public static void main(String[] args) throws Exception {
-		
+
 		claimWallet = ClaimWallet.getInstance();
-		
+
 		if (args.length == 0) {
 			// Print usage and exit
 			printUsage();
@@ -45,6 +45,7 @@ public class IDPTool {
 		String storePass = null;
 		String alias = null;
 		String keyPass = null;
+		String i1 = null;
 
 		for (int i = 0; i < args.length - 1; i++) {
 			String curr = args[i];
@@ -65,6 +66,8 @@ public class IDPTool {
 				alias = next;
 			} else if (curr.equals("-keypass")) {
 				keyPass = next;
+			} else if (curr.equals("-mk")) {
+				i1 = next.trim();
 			}
 		}
 
@@ -72,7 +75,7 @@ public class IDPTool {
 			System.out.println("-url Missing!");
 			printUsage();
 			System.exit(0);
-		} else if(action == null) {
+		} else if (action == null) {
 			System.out.println("-action Missing!");
 			printUsage();
 			System.exit(0);
@@ -90,7 +93,7 @@ public class IDPTool {
 			if (action.equals("list")) {
 				listClaims(conn);
 			} else if (action.equals("req_claim")) {
-				reqClaim(conn, claimName, user, keystorePath, storePass, alias, keyPass);
+				reqClaim(conn, claimName, user, keystorePath, storePass, alias, keyPass, i1);
 			} else {
 				System.out.println("Invalid action : " + action);
 			}
@@ -101,21 +104,21 @@ public class IDPTool {
 	}
 
 	/**
-	 * Request a claim from the IDP and process response. This will connect with
-	 * the given IDP and attempt to obtain a claim instance.
+	 * Request a claim from the IDP and process response. This will connect with the given IDP and attempt to obtain a
+	 * claim instance.
 	 * 
 	 * @param conn
 	 *            IDP connection
 	 * @param claimName
 	 *            Name of the claim
 	 * @param user
-	 *            Username to be used. This user should be already known to the
-	 *            IDP for the claim issuance to be successful.
+	 *            Username to be used. This user should be already known to the IDP for the claim issuance to be
+	 *            successful.
 	 * @param certPath
 	 *            Path to the certificate file.
 	 */
 	private static void reqClaim(IdentityProviderConnection conn, String claimName, String user, String storePath,
-			String storePass, String alias, String keyPass) {
+			String storePass, String alias, String keyPass, String i1) {
 		Map<String, IdentityClaimDefinition> claimDefs = conn.getAllClaimDefinitions();
 
 		// Check for the given claim
@@ -127,14 +130,14 @@ public class IDPTool {
 				FileInputStream is = new FileInputStream(storePath);
 				ks.load(is, storePass.toCharArray());
 				Key key = ks.getKey(alias, keyPass.toCharArray());
-				
+
 				long t1 = new Date().getTime();
-				IdentityClaimDefinition claimDef = claimDefs.get(claimName);				
-				IdentityClaim issuedClaim = conn.requestClaim(claimDef, (PrivateKey) key, user);
-				
+				IdentityClaimDefinition claimDef = claimDefs.get(claimName);
+				IdentityClaim issuedClaim = conn.requestClaim(claimDef, (PrivateKey) key, user, i1);
+
 				claimWallet.storeClaim(issuedClaim);
 				long t2 = new Date().getTime();
-				System.out.println(t2-t1);
+				System.out.println(t2 - t1);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

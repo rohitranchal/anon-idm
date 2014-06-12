@@ -7,6 +7,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.MessageDigest;
@@ -40,8 +41,7 @@ import org.ruchith.research.idm.IdentityClaim;
 import org.ruchith.research.idm.IdentityClaimDefinition;
 
 /**
- * This connection assumes the default implementation of the IDP.
- * This implementation is available at :
+ * This connection assumes the default implementation of the IDP. This implementation is available at :
  * https://anon-idm.googlecode.com/svn/trunk/impl/js/idp
  * 
  * @author Ruchith Fernando
@@ -52,7 +52,7 @@ public class BasicIdentityProviderConnection implements IdentityProviderConnecti
 	private Certificate idpCert;
 	private HashMap<String, IdentityClaimDefinition> claims = new HashMap<String, IdentityClaimDefinition>();
 	private String claimServiceUrl;
-	
+
 	public boolean connect(Properties configuration) {
 
 		String claimsUrl = configuration.getProperty("claims_url");
@@ -110,11 +110,9 @@ public class BasicIdentityProviderConnection implements IdentityProviderConnecti
 
 				tmpDef.setB64Hash(b64Dgst);
 				tmpDef.setB64Sig(b64Sig);
-				
+
 				ByteArrayInputStream bais = new ByteArrayInputStream(Base64.decode(b64Cert));
-				tmpDef.setCert(CertificateFactory.getInstance("X.509")
-						.generateCertificate(bais));
-				
+				tmpDef.setCert(CertificateFactory.getInstance("X.509").generateCertificate(bais));
 
 				this.claims.put(name, tmpDef);
 			}
@@ -128,7 +126,7 @@ public class BasicIdentityProviderConnection implements IdentityProviderConnecti
 			return false;
 		}
 	}
-	
+
 	private String readUrlContent(String claimsUrl) throws IOException, MalformedURLException {
 		InputStream is = new URL(claimsUrl).openStream();
 		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
@@ -149,60 +147,70 @@ public class BasicIdentityProviderConnection implements IdentityProviderConnecti
 	/**
 	 * Request a new key with the given master key.
 	 */
-	public IdentityClaim requestClaim(IdentityClaimDefinition claim, PrivateKey privKey, Element masterKey, String user)  throws IDPConnectionException{
+	public IdentityClaim requestClaim(IdentityClaimDefinition claim, PrivateKey privKey, Element masterKey, String user)
+			throws IDPConnectionException {
 
 		HashMap<String, String> values = new HashMap<String, String>();
-		
-		//{h_1}^{I_1}
+
+		// {h_1}^{I_1}
 		Element req = claim.getParams().getH1().powZn(masterKey);
-		
-		//TODO:Sign and Encrypt
-		
-		//Request parameters
+
+		// TODO:Sign and Encrypt
+
+		// Request parameters
 		values.put("claim", claim.getName());
 		values.put("user", user);
 		values.put("anonId", new String(Base64.encode(req.toBytes())));
 
 		try {
 			String resp = this.postRequest(values, this.claimServiceUrl);
-			//B64 decode
+			// B64 decode
 			String issuedClaimStr = new String(Base64.decode(resp));
-			//JSON decode
+			// JSON decode
 			ObjectMapper mapper = new ObjectMapper();
 			ObjectNode tmpOn = (ObjectNode) mapper.readTree(issuedClaimStr);
-			//Create an instanc of AEPrivateKey which is the issued claim
+			// Create an instanc of AEPrivateKey which is the issued claim
 			AEPrivateKey pk = new AEPrivateKey(tmpOn, claim.getParams().getPairing());
-			
-			//Create identity claim instance
+
+			// Create identity claim instance
 			IdentityClaim issuedClaim = new IdentityClaim();
 			issuedClaim.init(claim);
 			issuedClaim.setClaim(pk);
-			
-			return issuedClaim;			
+
+			return issuedClaim;
 		} catch (Exception e) {
 			throw new IDPConnectionException(e);
 		}
 
 	}
-	
+
 	/**
-	 * Request a new claim with a randomly generated master key.
-	 * Master key here is the identity I1 of the system.
+	 * Request a new claim with a randomly generated master key. Master key here is the identity I1 of the system.
 	 */
-	public IdentityClaim requestClaim(IdentityClaimDefinition claim, PrivateKey privKey, String user)  throws IDPConnectionException {
+	public IdentityClaim requestClaim(IdentityClaimDefinition claim, PrivateKey privKey, String user, String i1Val)
+			throws IDPConnectionException {
 		AEParameters params = claim.getParams();
-		Element i1 = params.getPairing().getZr().newRandomElement();
+		Element i1 = null;
+		if (i1Val != null) {
+			i1 = params.getPairing().getZr().newElement();
+			i1.set(new BigInteger(i1Val));
+		} else {
+			i1 = params.getPairing().getZr().newRandomElement();
+		}
 
 		IdentityClaim issuedClaim = this.requestClaim(claim, privKey, i1, user);
-		issuedClaim.setClaimKey(i1); //Add the claim key value
+		issuedClaim.setClaimKey(i1); // Add the claim key value
 
 		return issuedClaim;
 	}
 
 	/**
 	 * Generate an HTTP POST request to the given URL.
-	 * @param values Key value pairs to be sent as post params.
-	 * @param to URL to make the POST to.
+	 * 
+	 * @param values
+	 *            Key value pairs to be sent as post params.
+	 * @param to
+	 *            URL to make the POST to.
 	 * @return Value return from the POST.
 	 * @throws Exception
 	 */
