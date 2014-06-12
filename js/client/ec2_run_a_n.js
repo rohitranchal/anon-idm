@@ -31,13 +31,13 @@ var n = parseInt(process.argv[2]);
 
 
 var start = new Date().getTime();
-client.generateNRequests(n, function(err, val){
+// client.generateANRequests(n, function(err, val){
+client.generateANRequestsThreads(n, function(err, val){
 	var t1 = new Date().getTime();
-	request.post('http://ec2-54-82-231-14.compute-1.amazonaws.com:8001/authenticate_n_claims', {form:{request:val}}, function (error, response, body) {
+	request.post('http://ec2-54-82-231-14.compute-1.amazonaws.com:8001/authenticate_a_n_claims', {form:{request:val, num:n}}, function (error, response, body) {
 		if (!error && response.statusCode == 200) {
-
 			var t2 = new Date().getTime();
-			client.extractSessionKeyN(n, body, function(err, sk){
+			client.extractSessionKeyAN(n, body, function(err, sk){
 				var t3 = new Date().getTime();
 				if(typeof err != 'undefined') {
 					console.log(err);
@@ -46,7 +46,7 @@ client.generateNRequests(n, function(err, val){
 					request.post('http://ec2-54-82-231-14.compute-1.amazonaws.com:8001/operation', {form:{session_key:sk}}, function (error2, response2, body2) {
 						var end = new Date().getTime();
 
-						console.log(body2);
+												console.log(body2);
 						console.log('total : ' + (end - start));
 						console.log('req_creation : ' + (t1 - start));
 						console.log('auth call : ' + (t2 - t1));
