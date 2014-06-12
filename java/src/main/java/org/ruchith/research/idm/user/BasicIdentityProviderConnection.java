@@ -154,6 +154,7 @@ public class BasicIdentityProviderConnection implements IdentityProviderConnecti
 
 		// {h_1}^{I_1}
 		Element req = claim.getParams().getH1().powZn(masterKey);
+		System.out.println(req);
 
 		// TODO:Sign and Encrypt
 
@@ -196,6 +197,7 @@ public class BasicIdentityProviderConnection implements IdentityProviderConnecti
 			i1.set(new BigInteger(i1Val));
 		} else {
 			i1 = params.getPairing().getZr().newRandomElement();
+			System.out.println(i1.toBigInteger());
 		}
 
 		IdentityClaim issuedClaim = this.requestClaim(claim, privKey, i1, user);

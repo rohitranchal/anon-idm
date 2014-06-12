@@ -1,5 +1,6 @@
 package org.ruchith.research.idm.user;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -45,7 +46,32 @@ public class Client {
 		this.privKeys.put(claimName, tmpPriv);
 
 		Element val = conKeyGen.getTmpPubKey(r);
+		
+		System.out.println(val);
+		
+		byte[] bytes = val.toBytes();
+		return new String(Base64.encode(bytes));
+	}
 
+	public String generateRequestGivenR(String claimName, Element r) throws Exception {
+		IdentityClaim claim = wallet.getClaim(claimName);
+		System.out.println("Creating priv key of : " + claimName);
+		IdentityClaimDefinition icd = claim.getDefinition();
+
+		// Create request
+		AEParameters params = icd.getParams();
+
+		ContactKeyGen conKeyGen = new ContactKeyGen();
+		Element claimKey = claim.getClaimKey();
+		System.out.println(claimKey);
+		conKeyGen.init(claimKey, claim.getClaim(), params);
+		AEPrivateKey tmpPriv = conKeyGen.getTmpPrivKey(r);
+
+		this.privKeys.put(claimName, tmpPriv);
+
+		Element val = conKeyGen.getTmpPubKey(r);
+
+		System.out.println(val);
 		byte[] bytes = val.toBytes();
 		return new String(Base64.encode(bytes));
 	}
@@ -61,6 +87,25 @@ public class Client {
 			retVal += req;
 		}
 		return retVal;
+	}
+
+	public String generateANRequests(int n) throws Exception {
+
+		IdentityClaim claim = wallet.getClaim("claim_a_0");
+
+		IdentityClaimDefinition icd = claim.getDefinition();
+		AEParameters params = icd.getParams();
+		ContactKeyGen conKeyGen = new ContactKeyGen();
+		conKeyGen.init(claim.getClaimKey(), claim.getClaim(), params);
+		Element r = conKeyGen.genRandomID().getImmutable();
+
+		String lastReq = null;
+		for (int i = 0; i < n; i++) {
+			// Use the same r
+			lastReq = this.generateRequestGivenR("claim_a_" + i, r);
+		}
+		System.out.println(lastReq);
+		return lastReq;
 	}
 
 	public String extractSessionKey(String claimName, String spResponse) throws Exception {
@@ -224,6 +269,52 @@ public class Client {
 			this.res.add(tmpRes);
 		}
 
+	}
+
+	public String extractSessionKeyNThreadsOneReq(int n, String ch) throws Exception {
+
+		ObjectMapper mapper = new ObjectMapper();
+		ObjectNode cts = (ObjectNode) mapper.readTree(ch);
+
+		ArrayList<DecrypterThread> dts = new ArrayList<Client.DecrypterThread>();
+		// HashMap<String, Element> results = new HashMap<String, Element>();
+
+		Element res = this.wallet.getClaim("claim_a_0").getDefinition().getParams().getPairing().getGT().newOneElement();
+		for (int i = 0; i < n; i++) {
+			String claimName = "claim_a_" + i;
+			ObjectNode ctOn = (ObjectNode) cts.get(claimName);
+			IdentityClaim claim = this.wallet.getClaim(claimName);
+			AEPrivateKey tmpPriv = this.privKeys.get(claimName);
+
+			AEParameters params = claim.getDefinition().getParams();
+			AECipherTextBlock ct = new AECipherTextBlock(ctOn, params.getPairing());
+
+			DecrypterThread dt = new DecrypterThread(claimName, params, ct, tmpPriv, res);
+			dt.start();
+			dts.add(dt);
+		}
+
+		for (DecrypterThread dt : dts) {
+			dt.join();
+		}
+
+		// Collection<Element> values = results.values();
+		// Element res = null;
+		// for (Iterator iterator = values.iterator(); iterator.hasNext();) {
+		// System.out.println();
+		// Element element = (Element) iterator.next();
+		// if(res == null) {
+		// res = element;
+		// } else {
+		// res = res.add(element);
+		// }
+		// }
+
+		// System.out.println("Final: " + res);
+		String sk = new String(Base64.encode(res.toBytes()));
+		sk = sk.replaceAll(" ", "");
+		// System.out.println("Returned : "+ sk);
+		return sk;
 	}
 
 }
