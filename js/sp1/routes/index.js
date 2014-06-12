@@ -3,6 +3,7 @@ var uuid = require('node-uuid');
 
 var files = fs.readdirSync('./claim_defs/');
 var claim_defs = new Array();
+var claim_a_defs = new Array();
 var claim_def_student = null;
 var claim_def_cand = null;
 
@@ -10,10 +11,14 @@ for(var i = 0; i < files.length; i++) {
 	fs.readFile('./claim_defs/' + files[i], 'utf8', function(err, data) {
 
 		var name = JSON.parse(data).name;
+
 		if(name == 'student') {
 			claim_def_student = data;
 		} else if(name == 'candidate') {
 			claim_def_cand = data;
+		} else if(name.indexOf('claim_a_') == 0) {
+			var index = name.substring(8);
+			claim_a_defs[index] = data;
 		} else {
 			var index = name.substring(5);
 			claim_defs[index] = data;
@@ -130,6 +135,32 @@ exports.authenticate_n_claims_t = function(req, res) {
 
 	//Encrypt session key
 	sp.createChallangeNClaimsThreads(user_req, tmp_cd, function(err, val){
+		if(typeof err != 'undefined') {
+			console.log(err);
+		}
+		val = JSON.parse(val);
+
+		var session_key = val.SessionKey;
+
+		sessions[sessions.length] = session_key;
+		last_session = session_key;
+
+		delete val.SessionKey;
+		res.send(val);
+
+	});
+};
+
+exports.authenticate_a_n_claims_t = function(req, res) {
+	var user_req = req.body.request;
+	var num = req.body.num;
+
+
+	var tmp_cd = JSON.stringify(claim_a_defs);
+	user_req = JSON.stringify(user_req);
+
+	//Encrypt session key
+	sp.createChallangeNAClaimsThreads(user_req, tmp_cd, parseInt(num), function(err, val){
 		if(typeof err != 'undefined') {
 			console.log(err);
 		}
