@@ -1,7 +1,7 @@
 var db = require('../db');
 fs = require('fs');
 
-var jars_dir = "/Users/ruchith/Documents/research/anon_idm/source/java/target/";
+var jars_dir = fs.readFileSync('jars_dir', 'utf8').trim();
 
 var java = require("java");
 java.classpath.push(jars_dir + "lib/base-1.0-SNAPSHOT.jar");
@@ -20,7 +20,7 @@ java.classpath.push(jars_dir + "lib/junit-3.8.1.jar");
 java.classpath.push(jars_dir + "lib/mysql-connector-java-5.1.22.jar");
 java.classpath.push(jars_dir + "idp-1.0-SNAPSHOT.jar");
 
-var configDir = "/Users/ruchith/Documents/research/anon_idm/source/java/config";
+var configDir = fs.readFileSync('config_dir', 'utf8').trim();
 
 var IdentityManager = java.import('org.ruchith.research.idm.idp.IdentityManager');
 var idm = new IdentityManager(configDir);
