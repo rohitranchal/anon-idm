@@ -83,7 +83,7 @@ public class IdentityManager {
 
 			Element h2 = g1.newElement();
 			h2.setFromBytes(this.config.getH2());
-			params.setH1(h2.getImmutable());
+			params.setH2(h2.getImmutable());
 		}
 
 		Element mk = paramGen.getMasterKey();
