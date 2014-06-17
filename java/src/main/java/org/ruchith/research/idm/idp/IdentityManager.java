@@ -71,34 +71,38 @@ public class IdentityManager {
 	 * @return An instance of {@link IdentityClaimDefinition} which holds the public parameters and the master key.
 	 */
 	public IdentityClaimDefinition generateNewClaimDefinition(String name, String desc) throws Exception {
-		// CurveParams curveParams = (CurveParams) new TypeA1CurveGenerator(4, 32).generate();
+		 CurveParams curveParams = (CurveParams) new TypeA1CurveGenerator(4, 32).generate();
 //		CurveParams curveParams = new CurveParams().load(new ByteArrayInputStream(this.config.getParamFileContents()));
+		double t1 = new Date().getTime();
 		AEParameterGenerator paramGen = new AEParameterGenerator();
-//		paramGen.init(curveParams);
-		ObjectMapper mapper = new ObjectMapper();
-		ObjectNode on = (ObjectNode)mapper.readTree(new String(this.config.getParamFileContents()));
-		AEParameters from = new AEParameters(on);
-		AEParameters params = paramGen.generateParameters(from);
+		paramGen.init(curveParams);
+//		ObjectMapper mapper = new ObjectMapper();
+//		ObjectNode on = (ObjectNode)mapper.readTree(new String(this.config.getParamFileContents()));
+//		AEParameters from = new AEParameters(on);
+//		AEParameters params = paramGen.generateParameters(from);
+		AEParameters params = paramGen.generateParameters();
 
-		if (this.config.isUseSameH1AndH2()) {
-			Field g1 = params.getPairing().getG1();
-			Element h1 = g1.newElement();
-			h1.setFromBytes(this.config.getH1());
-			params.setH1(h1.getImmutable());
-
-			Element h2 = g1.newElement();
-			h2.setFromBytes(this.config.getH2());
-			params.setH2(h2.getImmutable());
-		}
+//		if (this.config.isUseSameH1AndH2()) {
+//			Field g1 = params.getPairing().getG1();
+//			Element h1 = g1.newElement();
+//			h1.setFromBytes(this.config.getH1());
+//			params.setH1(h1.getImmutable());
+//
+//			Element h2 = g1.newElement();
+//			h2.setFromBytes(this.config.getH2());
+//			params.setH2(h2.getImmutable());
+//		}
 
 		Element mk = paramGen.getMasterKey();
 
 		IdentityClaimDefinition claimDef = new IdentityClaimDefinition(name, params, mk);
+		
 
 		if (desc != null) {
 			claimDef.setDescription(desc);
 		}
-
+		double t2 = new Date().getTime();
+		
 		byte[] contentBytes = claimDef.getDgstContet().getBytes();
 
 		// Create digest
@@ -107,6 +111,7 @@ public class IdentityManager {
 		byte[] sha512Dgst = dgst.digest();
 		claimDef.setB64Hash(new String(Base64.encode(sha512Dgst)));
 
+		double t3 = new Date().getTime();
 		// Sign claim definition
 		Signature sig = Signature.getInstance("SHA512withRSA");
 		sig.initSign(this.privKey);
@@ -116,9 +121,15 @@ public class IdentityManager {
 
 		// Set the pub key cert of the idp
 		claimDef.setCert(this.cert);
+		double t4 = new Date().getTime();
 
 		this.db.storeClaimDefinition(claimDef);
-
+		double t5 = new Date().getTime();
+		
+		System.out.println("Defn" + (t2 - t1));
+		System.out.println("Dgst" + (t3 - t2));
+		System.out.println("Sign" + (t4 - t3));
+		System.out.println("Store" + (t5 - t4) + "\n");
 		return claimDef;
 	}
 
