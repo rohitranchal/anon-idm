@@ -1,3 +1,7 @@
+CREATE DATABASE IF NOT EXISTS idp;
+
+USE idp;
+
 DROP TABLE Claim_Definition;
 CREATE TABLE Claim_Definition (
 	Name VARCHAR(512) NOT NULL PRIMARY KEY,
