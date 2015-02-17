@@ -1,0 +1,17 @@
+Use mysql to create a new db 'idp'
+Use anon-idm/java/db/init.sql to create tables
+
+svn checkout https://anon-encrypt.googlecode.com/svn/trunk/ anon-encrypt --username rohitranchal@gmail.com
+
+cd anon-encrypt/impl/base
+mvn clean install
+This will put the correct repo in ~/.m2/repositoty/org/ruchith
+
+cd anon-idm/java
+mvn clean install
+
+Update /Users/rranchal/dev/anon-idm/js/idp/jars_dir to point to correct path
+
+Update /Users/rranchal/dev/anon-idm/js/idp/config_dir to point to correct path
+
+create a claim - cs101
