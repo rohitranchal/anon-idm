@@ -14,4 +14,13 @@ Update /Users/rranchal/dev/anon-idm/js/idp/jars_dir to point to correct path
 
 Update /Users/rranchal/dev/anon-idm/js/idp/config_dir to point to correct path
 
+mysql path: change in anon-idm/java/config
+
 create a claim - cs101
+
+<identity provider>
+1. admin view
+/admin
+
+2. user view
+/user
