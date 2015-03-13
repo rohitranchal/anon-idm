@@ -1,0 +1,9 @@
+1. How to execute the program 
+    (a) After setting path in health_care.cfg, execute ./configure.py
+    (b) In each directory
+        node app.js
+
+2. Program structure
+   (a) java
+   (b) apps: node.js applications
+     apps
