@@ -22,6 +22,11 @@ java.classpath.push(jars_dir + "lib/mysql-connector-java-5.1.22.jar");
 java.classpath.push(jars_dir + "lib/idp-1.0-SNAPSHOT.jar");
 java.classpath.push(jars_dir + "healthcare-1.0-SNAPSHOT.jar");
 
+var wallet_dir = fs.readFileSync('./wallet_dir', 'utf8').trim();
+console.log("Reading wallet_dir: " + wallet_dir);
+
 var Client = java.import('org.ruchith.research.idm.user.Client');
 //var client = new Client(wallet_dir);
 //exports.client = client;
+
+exports.wallet_dir = wallet_dir

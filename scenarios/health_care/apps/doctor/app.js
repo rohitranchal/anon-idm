@@ -29,7 +29,7 @@ app.use(app.router);
 // index page
 app.get('/', routes.index);
 
-// pages for reqest permission
+// handling reqest permission services
 app.get('/req_permission_page', routes.req_permission_page);
 app.post('/req_permission', routes.req_permission);
 
