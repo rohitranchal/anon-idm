@@ -10,6 +10,7 @@ configs = ConfigParser.RawConfigParser()
 configs.read(configFilePath)
 config_dir = configs.get('PATH', 'config_dir')
 jars_dir = configs.get('PATH', 'jars_dir')
+wallet_dir = configs.get('PATH', 'wallet_dir')
 
 ###################################
 # configuration on patient's app  #
@@ -46,3 +47,11 @@ if os.path.exists(doctor_jars_dir):
 
 with open(doctor_jars_dir, 'w') as f:
     f.write(jars_dir)
+
+doctor_wallet_dir = doctor_dir + 'wallet_dir'
+if os.path.exists(doctor_wallet_dir):
+    print "wallet_dir exists and it will be rewritten"
+    os.remove(doctor_wallet_dir)
+
+with open(doctor_wallet_dir, 'w') as f:
+    f.write(wallet_dir)
