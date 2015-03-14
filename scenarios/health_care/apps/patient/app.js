@@ -10,6 +10,9 @@ var routes = require('./routes');
 var users = require('./routes/user');
 
 var app = express();
+app.listen(3001, function() {
+    console.log("Patient's app is listening to port 3001");
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -23,7 +26,16 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(app.router);
 
+// index page
 app.get('/', routes.index);
+
+// handling user relevant service
+app.get('/list_user', routes.list_user);
+app.post('/add_user', routes.add_user);
+
+//app.get('/test', routes.test);
+//app.get('/claimdef_show', routes.claimdef_show);
+//app.get('/req_claim', routes.req_claim);
 app.get('/users', users.list);
 
 /// catch 404 and forwarding to error handler
