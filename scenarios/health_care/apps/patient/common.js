@@ -1,6 +1,5 @@
 console.log("Including common.js");
 
-//var db = require('../db');
 var fs = require('fs');
 var jars_dir = fs.readFileSync('./jars_dir', 'utf8').trim();
 console.log("Reading jars_dir: " + jars_dir);
@@ -23,12 +22,11 @@ java.classpath.push(jars_dir + "lib/mysql-connector-java-5.1.22.jar");
 java.classpath.push(jars_dir + "lib/idp-1.0-SNAPSHOT.jar");
 java.classpath.push(jars_dir + "healthcare-1.0-SNAPSHOT.jar");
 
-var config_dir = fs.readFileSync('./config_dir', 'utf8').trim();
-console.log("Reading config_dir: " + config_dir);
-
+var config_dir = require('path').dirname(process.mainModule.filename) + "/config";
+console.log("Setting config_dir: " + config_dir);
 var IdentityManager = java.import('org.ruchith.research.idm.idp.IdentityManager');
 var idm = new IdentityManager(config_dir);
-idm.testing();
 
 exports.idm = idm;
 exports.java = java;
+exports.config_dir = config_dir;

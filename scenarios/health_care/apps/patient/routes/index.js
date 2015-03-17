@@ -1,5 +1,12 @@
 var common = require('../common.js');
 var db = require('../db');
+var request = require('request');
+var fs = require('fs');
+
+
+//TODO list user button
+//TODO add user button
+//TODO allow permission page
 
 /* GET home page. */
 exports.index = function(req, res){
@@ -39,6 +46,66 @@ exports.add_user = function(req, res) {
         }
     });
     console.log("done");
+};
+
+exports.allow_permission_page = function(req, res) {
+    console.log('allow_permission_page is called');
+    //res.send('allow_permission_page is under construnction');
+    db.get_user_details(function(val) {
+        res.render('allow_permission_page', { title: 'User List', user_list : val });
+    });
+};
+
+exports.allow_permission = function(req, res) {
+    console.log('allow_permission is called');
+    console.log('allow_permission value: ' + req.body.selection);
+    // With this value, the target url needs to be updated
+    // TODO what to do?
+    request.post('http://localhost:3002/update_permission',
+        {form: {key: req.body.selection}}, // TODO what to send?
+        function(error, response, body) {
+            if(error) {
+                console.log("Error in allow_permission" + error);
+                res.send("Error occur!");
+            }
+            else {
+                console.log("Success in sending allow_permission");
+                console.log("response from remote: " + body);
+                // TODO response with previous call
+                // TODO what to print out for response 
+                res.send("Success in sending allow_permission!");
+            }
+        });
+
+};
+
+// TODO another improvement?
+exports.cert = function(req, res) {
+    console.log("cert is called");
+	fs.readFile(common.config_dir + '/cert', 'utf8', function (err,data) {
+		if (err) {
+            console.log("Error in reading file");
+            res.send("Error in reading file");
+            return;
+		}
+        else {
+            console.log("cert succeed!");
+		    res.send(data);
+        }
+	});
+};
+
+// TODO another improvement?
+exports.claims = function(req, res) {
+    console.log("claims is called");
+	db.getAllClaimDefs(function(val){
+        console.log("result of java execution:");
+        console.log(val);
+		res.send(val);
+	});
+};
+
+exports.issue_claim = function(req, res) {
 };
 
 exports.test = function(req, res) {

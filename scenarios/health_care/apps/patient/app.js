@@ -29,11 +29,24 @@ app.use(app.router);
 // index page
 app.get('/', routes.index);
 
+// claim definition management
+app.get('/add_claimdef_page', routes.add_claimdef_page);
+app.post('/add_claimdef', routes.add_claimdef);
+
+
 // handling user relevant service
 app.get('/list_user', routes.list_user);
 app.post('/add_user', routes.add_user);
 
-//app.get('/test', routes.test);
+
+
+// handling issuing claims
+app.get('/allow_permission_page', routes.allow_permission_page);
+app.post('/allow_permission', routes.allow_permission);
+
+app.get('/cert/', routes.cert);
+app.get('/claims', routes.claims);
+
 //app.get('/claimdef_show', routes.claimdef_show);
 //app.get('/req_claim', routes.req_claim);
 app.get('/users', users.list);

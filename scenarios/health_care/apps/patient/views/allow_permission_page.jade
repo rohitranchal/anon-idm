@@ -1,0 +1,23 @@
+extends layout
+
+block content
+  h1 Allow Permission
+  form(name="", method="post", action="/allow_permission")
+    table(border="1")
+      tr
+        th=""
+        th="Name"
+        th="Date Created"
+
+      for user in user_list
+        if user.Registered == 'N'
+          tr
+            td
+              input(type="radio" name="selection" value=user.Name)
+            td=user.Name
+            td=user.DateCreated
+
+    input(type="submit", name="submit", value="submit")
+
+
+    
