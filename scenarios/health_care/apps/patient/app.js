@@ -44,6 +44,7 @@ app.post('/allow_permission', routes.allow_permission);
 
 app.get('/cert/', routes.cert);
 app.get('/claims', routes.claims);
+app.post('/claim_service', routes.issue_claim);
 
 //app.get('/claimdef_show', routes.claimdef_show);
 //app.get('/req_claim', routes.req_claim);

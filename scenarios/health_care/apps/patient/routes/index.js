@@ -102,6 +102,8 @@ exports.allow_permission = function(req, res) {
                 console.log("response from remote: " + body);
                 // TODO response with previous call
                 // TODO what to print out for response 
+
+                // TODO delete user list from the databse for the registered one
                 res.send("Success in sending allow_permission!");
             }
         });
@@ -135,6 +137,19 @@ exports.claims = function(req, res) {
 };
 
 exports.issue_claim = function(req, res) {
+    console.log("issue_claim is called");
+    common.idm.issueSerializedClaim(req.body.claim, req.body.user, req.body.anonId,
+        function(err, result) {
+            if(err) {
+                console.log("error in issue_claim: " + err);
+                res.send(err);
+            }
+            else {
+		        console.log("success in issue_claim: " + result);
+		        res.send(result);
+            }
+	    }
+    );
 };
 
 exports.test = function(req, res) {
