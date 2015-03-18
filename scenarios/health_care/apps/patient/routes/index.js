@@ -14,12 +14,33 @@ exports.index = function(req, res){
     res.render('index', { title: 'Health Record Manager' });
 };
 
-// Simply list all the information consumer currently allowed
-exports.list_user = function(req, res) {
-    console.log('list_user is called');
-    db.get_user_details(function(val) {
-        res.render('list_user', { title: 'User List', user_list : val });
-    });
+exports.add_claimdef_page = function(req, res) {
+    console.log('add_claimdef_page is called');
+    res.render('add_claimdef_page');
+};
+
+exports.add_claimdef = function(req, res) {
+    console.log("add_claimdef is called");
+	common.idm.generateNewClaimDefinition(req.body.name, req.body.description, 
+        function(err, val) {
+            if(err) {
+                console.log("error in add_claimdef_page");
+                res.send("error in add_claimdef_page");
+            }
+            else {
+                console.log("success in add_claimdef_page");
+                res.send("success in add_claimdef_page");
+            }
+        }
+    );
+};
+
+exports.list_claimdef = function(req, res) {
+    console.log("list_claimdef is called");
+	db.getAllClaimDefs(function(val){
+        console.log(val);
+		res.send(val);
+	});
 };
 
 // Adding user to database
@@ -46,6 +67,14 @@ exports.add_user = function(req, res) {
         }
     });
     console.log("done");
+};
+
+// Simply list all the information consumer currently allowed
+exports.list_user = function(req, res) {
+    console.log('list_user is called');
+    db.get_user_details(function(val) {
+        res.render('list_user', { title: 'User List', user_list : val });
+    });
 };
 
 exports.allow_permission_page = function(req, res) {

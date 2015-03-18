@@ -32,13 +32,11 @@ app.get('/', routes.index);
 // claim definition management
 app.get('/add_claimdef_page', routes.add_claimdef_page);
 app.post('/add_claimdef', routes.add_claimdef);
-
+app.get('/list_claimdef', routes.list_claimdef);
 
 // handling user relevant service
 app.get('/list_user', routes.list_user);
 app.post('/add_user', routes.add_user);
-
-
 
 // handling issuing claims
 app.get('/allow_permission_page', routes.allow_permission_page);
