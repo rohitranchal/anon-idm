@@ -33,6 +33,9 @@ app.get('/', routes.index);
 app.get('/req_permission_page', routes.req_permission_page);
 app.post('/req_permission', routes.req_permission);
 
+// handling issuing claims
+app.post('/update_permission', routes.update_permission);
+
 // pages for seeing the patient's record
 //app.get('/list_results');
 //app.get('/show_something');

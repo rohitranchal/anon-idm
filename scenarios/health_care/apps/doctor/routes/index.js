@@ -20,7 +20,7 @@ exports.req_permission = function(req, res) {
     // TODO dynamically read the certificate
     // read from wallet
     var id = 'bob';
-    var cert_content = fs.readFileSync(common.wallet_dir + id + '.cert', 'utf8').trim();
+    var cert_content = fs.readFileSync(common.keystore_dir + "/" + id + '.cert', 'utf8').trim();
     console.log("id: " + id);
     console.log("cert_content: " + cert_content);
 
@@ -36,6 +36,37 @@ exports.req_permission = function(req, res) {
             else { // When status code is 200
                 // TODO error handling
                 res.send(body);
+            }
+        }
+    );
+};
+
+/*
+String idpUrl, String claimName, String user, String storePath,
+			String storePass, String alias, String keyPass
+*/
+
+exports.update_permission = function(req, res) {
+    var idpUrl = 'http://localhost:3001';
+    var claimName = 'doctor' ;
+    var user = 'bob';
+    var storePath = common.keystore_dir + "/bob.jks";
+    var storePass = common.keystore_pass;
+    var alias = 'bob';
+    var keyPass = 'bobkey';
+    console.log('update_permission is called');
+
+    common.java.callStaticMethod('org.ruchith.research.idm.user.IDPTool2', 'reqClaim',
+        idpUrl, claimName, user, storePath, storePass, alias, keyPass,
+        function(err, val) {
+            if(err) {
+                console.log("Error in reqClaim(java): " + err);
+                res.send("Error during processing(java)");
+            }
+            else {
+                console.log("Success in reqClaim(java)");
+                res.send("Sucess in reqClaim(java)");
+
             }
         }
     );
