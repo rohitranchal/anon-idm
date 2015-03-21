@@ -7,15 +7,14 @@ block content
       tr
         th=""
         th="Name"
-        th="Date Created"
+        th="Record Id"
 
       for user in user_list
-        if user.Registered == 'N'
-          tr
-            td
-              input(type="radio" name="selection" value=user.Name)
-            td=user.Name
-            td=user.DateCreated
+        tr
+          td
+            input(type="radio" name="selection" value=user.Name + "_" + user.RecordId)
+          td=user.Name
+          td=user.RecordId
 
     input(type="submit", name="submit", value="submit")
 

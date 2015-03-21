@@ -44,11 +44,11 @@ app.post('/allow_permission', routes.allow_permission);
 
 app.get('/cert/', routes.cert);
 app.get('/claims', routes.claims);
+// TODO change name...?
 app.post('/claim_service', routes.issue_claim);
 
-//app.get('/claimdef_show', routes.claimdef_show);
-//app.get('/req_claim', routes.req_claim);
-app.get('/users', users.list);
+app.get('/claimdef/:id', routes.claimdef);
+app.get('/param_names/:id', routes.param_names);
 
 /// catch 404 and forwarding to error handler
 app.use(function(req, res, next) {

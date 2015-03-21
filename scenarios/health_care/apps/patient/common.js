@@ -20,12 +20,12 @@ java.classpath.push(jars_dir + "lib/jpbc-plaf-1.1.0.jar");
 java.classpath.push(jars_dir + "lib/junit-3.8.1.jar");
 java.classpath.push(jars_dir + "lib/mysql-connector-java-5.1.22.jar");
 java.classpath.push(jars_dir + "lib/idp-1.0-SNAPSHOT.jar");
-java.classpath.push(jars_dir + "healthcare-1.0-SNAPSHOT.jar");
+java.classpath.push(jars_dir + "healthcare-0.1-SNAPSHOT.jar");
 
 var config_dir = require('path').dirname(process.mainModule.filename) + "/config";
 console.log("Setting config_dir: " + config_dir);
-var IdentityManager = java.import('org.ruchith.research.idm.idp.IdentityManager');
-var idm = new IdentityManager(config_dir);
+var Patient = java.import('org.ruchith.research.scenarios.healthcare.owner.Patient');
+var idm = new Patient(config_dir);
 
 exports.idm = idm;
 exports.java = java;
