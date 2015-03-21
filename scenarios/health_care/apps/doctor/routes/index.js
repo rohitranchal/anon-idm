@@ -25,7 +25,7 @@ exports.req_permission = function(req, res) {
     console.log("cert_content: " + cert_content);
 
     request.post('http://localhost:3001/add_user', 
-        {form: {name: id, cert: cert_content}},
+        {form: {name: id, cert: cert_content, type: 1, record_id: req.body.record_id }},
         function(error, response, body) {
             if(error) {
                 res.send('error in req_permission');
@@ -46,9 +46,16 @@ String idpUrl, String claimName, String user, String storePath,
 			String storePass, String alias, String keyPass
 */
 
+// TODO dynamically change
+// claimName: claim from identity provider
+// user: user name from the current program
+// storePath: keystore's path
+// storePass: keystore's password
+// alias: alias used for private key in keystore
+// keyPass: private key's password
 exports.update_permission = function(req, res) {
     var idpUrl = 'http://localhost:3001';
-    var claimName = 'doctor' ;
+    var claimName = req.body.key;
     var user = 'bob';
     var storePath = common.keystore_dir + "/bob.jks";
     var storePass = common.keystore_pass;
