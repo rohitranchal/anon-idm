@@ -1,10 +1,5 @@
 var common = require('../common.js');
 
-/* GET: home page. */
-exports.index = function(req, res){
-  res.render('index', { title: 'Express' });
-};
-
 /* request in promise format */
 var request = function(method, target) {
     return new Promise(function(resolve, reject) {
@@ -25,6 +20,17 @@ var request = function(method, target) {
        }
     });
 };
+
+/* GET: home page. */
+exports.index = function(req, res){
+    res.render('index', { title: 'Express' });
+};
+
+/* GET: get register_record_page */
+exports.register_record_page = function(req, res) {
+    console.log('reguster_record_page is called');
+    res.render('register_record_page');
+}
 
 /* GET: get public params from claimsdefs for record id 
  */
@@ -53,6 +59,7 @@ exports.get_parameters = function(req, res) {
         console.log(result[0]);
         console.log(result[1]);
         //TODO
+        public_params = { "owner": result[0], "read": result[1] };
         res.send("Still working!");
     }, function(error) {
         console.log("Errors: " + error);

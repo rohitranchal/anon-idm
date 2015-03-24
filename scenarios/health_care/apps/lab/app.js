@@ -27,6 +27,15 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(app.router);
 
 app.get('/', routes.index);
+app.get('/register_record_page', routes.register_record_page);
+
+/*
+app.post('/register_record');
+app.get('/list_record');
+app.get('/update_hie_page');
+app.get('/update_hie');
+*/
+
 app.get('/get_parameters/:id', routes.get_parameters);
 
 /// catch 404 and forwarding to error handler
