@@ -28,9 +28,46 @@ exports.index = function(req, res){
 
 /* GET: get register_record_page */
 exports.register_record_page = function(req, res) {
-    console.log('reguster_record_page is called');
+    console.log('register_record_page is called');
     res.render('register_record_page');
 }
+
+exports.register_record = function(req, res) {
+    console.log('register_record is called');
+    console.log('record id: ' + req.body.record_id); 
+
+    // TODO SELF 
+    request('get', 'http://localhost:3003/get_parameters/' + req.body.record_id)
+    .then(function(result) {
+        var params = JSON.parse(result.body);
+        console.log("Owner: " + params.owner);
+        console.log("Read: " + params.read);
+        return insert_new_empty_record(params.owner, params.read);
+    })
+    .then(function(result) {
+        console.log("success in register_record!");
+        respond("updated!");
+    }, function(error) {
+        console.log("Error in register_record: " + error);
+    });
+
+}
+
+var insert_new_empty_record = function(own, read) {
+    return new Promise(function(resolve, reject) {
+        common.lab.initRecord(own, read, function(err, res) {
+            if(err) reject(err);
+            else resolve(res);
+        });
+    });
+};
+
+exports.update_record_page = function(req, res) {
+}
+
+exports.update_record = function(req, res) {
+};
+
 
 /* GET: get public params from claimsdefs for record id 
  */
@@ -60,11 +97,11 @@ exports.get_parameters = function(req, res) {
         console.log(result[1]);
         //TODO
         public_params = { "owner": result[0], "read": result[1] };
-        res.send("Still working!");
+        res.send(public_params);
     }, function(error) {
         console.log("Errors: " + error);
     });
-}
+};
 
 var get_claim_and_extract_public_params = function(name) {
     return request('get', 'http://localhost:3001/claimdef/' + name)
@@ -75,7 +112,7 @@ var get_claim_and_extract_public_params = function(name) {
 };
 
 var extract_public_params_promise = function(ip) {
-    return new Promise(function(resolve, conflict) {
+    return new Promise(function(resolve, reject) {
         common.lab.extractPublicParams(ip, function(err, res) {
             if(err) reject(err);
             else resolve(res);

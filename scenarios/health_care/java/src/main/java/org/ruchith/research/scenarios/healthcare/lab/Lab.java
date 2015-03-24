@@ -4,6 +4,8 @@ import org.bouncycastle.util.encoders.Base64;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
+import org.ruchith.research.idm.idp.Configuration;
+import org.ruchith.research.scenarios.healthcare.lab.db.Database;
 
 /**
  * 
@@ -11,6 +13,15 @@ import org.codehaus.jackson.node.ObjectNode;
  *
  */
 public class Lab {
+	
+	private Configuration config;
+	private Database db;
+	
+	public Lab(String configPath) throws Exception {
+		this.config = Configuration.getInstance(configPath);
+		this.db = Database.getInstance(this.config.getDbHost(), this.config.getDbUser(), this.config.getDbPassword());		
+	}
+	
 	/**
 	 * Extract public parameter in claim definition
 	 * 
@@ -45,4 +56,16 @@ public class Lab {
 
 		return params;
 	}
+	
+	/**
+	 * 
+	 * @param ownerParam
+	 * @param readParam
+	 * @throws Exception
+	 */
+	public void initRecord(String ownerParam, String readParam) 
+			throws Exception {
+		db.storeIdAndParams(ownerParam, readParam);
+	}
+
 }
