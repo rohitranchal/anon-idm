@@ -67,5 +67,10 @@ public class Lab {
 			throws Exception {
 		db.storeIdAndParams(ownerParam, readParam);
 	}
+	
+	public void updateRecord(String id, String Record) 
+			throws Exception {
+		db.updateRecord(id, Record);
+	}
 
 }

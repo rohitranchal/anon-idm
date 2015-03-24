@@ -30,7 +30,9 @@ public class Database {
 		con.createStatement().execute(sql);
 	}
 	
-	/*
-	 * public void updateRecord
-	 */
+	public void updateRecord(String id, String Record) 
+			throws Exception {
+		String sql = "UPDATE LabRecord SET Record='" + Record + "' WHERE id=" + id;
+		con.createStatement().execute(sql);
+	}
 }

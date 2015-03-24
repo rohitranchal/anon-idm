@@ -1,0 +1,22 @@
+extends layout
+
+block content
+  h1 Update Record
+
+  form(name="", method="post", action="/update_record")
+    table(border="1" width="320")
+      tr
+        th(width="10")
+        th="id"
+        th="record"
+
+      for record in record_list
+        tr
+          td
+            input(type="radio" name="selection" value=record.id)
+          td=record.id
+          td=record.record
+    
+    textarea(rows="15" cols="50" name="record_content")
+    br
+    input(type="submit", name="submit", value="submit") 

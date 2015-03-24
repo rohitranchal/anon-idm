@@ -1,4 +1,5 @@
 var common = require('../common.js');
+var db = require('../db');
 
 /* request in promise format */
 var request = function(method, target) {
@@ -23,7 +24,7 @@ var request = function(method, target) {
 
 /* GET: home page. */
 exports.index = function(req, res){
-    res.render('index', { title: 'Express' });
+    res.render('index', { title: 'Lab' });
 };
 
 /* GET: get register_record_page */
@@ -63,9 +64,36 @@ var insert_new_empty_record = function(own, read) {
 };
 
 exports.update_record_page = function(req, res) {
+    db.get_all_lab_records()
+    .then(function(result) {
+        console.log(result);
+        res.render('update_record_page', { record_list: result });
+    }, function(error) {
+        console.log(error);
+    });
 }
 
 exports.update_record = function(req, res) {
+    console.log("test1: " + req.body.selection);
+    console.log("test2: " + req.body.record_content);
+
+    update_record_info(req.body.selection, req.body.record_content)
+    .then(function(result) {
+        console.log("Hello!");
+        res.render('update_record', {home_url: 'http://localhost:3003/' , content: "update record success!"});
+    },
+    function(error) {
+        console.log(error);
+    });
+};
+
+var update_record_info = function(id, record) {
+    return new Promise(function(resolve, reject) {
+        common.lab.updateRecord(id, record, function(err, res) {
+            if(err) reject(err);
+            else resolve(res);
+        });
+    });
 };
 
 
