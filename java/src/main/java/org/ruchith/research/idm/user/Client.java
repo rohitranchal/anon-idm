@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Set;
 
 import org.bouncycastle.util.encoders.Base64;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -27,6 +28,18 @@ public class Client {
 
 	public Client(String walletDir) throws Exception {
 		this.wallet = ClaimWallet.getInstance(walletDir);
+	}
+	
+	public String getClaimdefNameJson() throws Exception {
+		Set<String> set = wallet.getClaimdefNameSet();
+		ObjectMapper mapper = new ObjectMapper();
+		String res = mapper.writeValueAsString(set);
+		
+		return res;
+	}
+	
+	public String getClaimdef(String claimDefName) {
+		return wallet.getClaim(claimDefName).getDefinition().serializeJSON().toString();
 	}
 
 	public String generateRequest(String claimName) throws Exception {

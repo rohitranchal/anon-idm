@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -68,13 +69,24 @@ public class ClaimWallet {
 	 *            The claim instance to be stored.
 	 */
 	public void storeClaim(IdentityClaim claim) throws Exception {
+		// claim name is the "key"
+		this.claims.put(claim.getDefinition().getName(), claim);
+		
 		// Remove directory seperator to avoid issue in creating the claim file
+		String filename = claim.getDefinition().getB64Hash().replace(File.separator, "").replace("\\", "").replace("=", "")
+					.replace("+", "");
+		// Store in wallet directory
+		String claimFilePath = this.walletDir.getAbsolutePath() + File.separator + filename;		
+
+		/* 
+		 * This stores filename as a key in the data structure which doesn't match
 		String key = claim.getDefinition().getB64Hash().replace(File.separator, "").replace("\\", "").replace("=", "")
 				.replace("+", "");
+		System.out.println(key);
 		this.claims.put(key, claim);
 
-		// Store in wallet directory
 		String claimFilePath = this.walletDir.getAbsolutePath() + File.separator + key;
+		*/
 		FileUtils.writeStringToFile(new File(claimFilePath), claim.serializeJSON());
 	}
 
@@ -95,5 +107,12 @@ public class ClaimWallet {
 	public IdentityClaim getClaim(String id) {
 		return this.claims.get(id);
 	}
-	
+
+	/**
+	 * Set of claimdefs currently existing in wallet
+	 * @return
+	 */
+	public Set<String> getClaimdefNameSet() {
+		return claims.keySet();
+	}
 }
