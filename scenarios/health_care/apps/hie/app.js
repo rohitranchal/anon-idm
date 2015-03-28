@@ -3,13 +3,15 @@ var http = require('http');
 var path = require('path');
 var favicon = require('static-favicon');
 var logger = require('morgan');
-var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var session = require('express-session');
 
 var routes = require('./routes');
-var users = require('./routes/user');
 
 var app = express();
+app.listen(3004, function() {
+    console.log("HIE's app is listening to port 3004");
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -19,12 +21,45 @@ app.use(favicon());
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
-app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// session setup
+app.use(session({
+  resave: false, // don't save session if unmodified
+  saveUninitialized: false, // don't create session until something stored
+  // TODO allocate secret which is secure random
+  secret: 'shhhh, very secret'
+}));
+
+// common log
+// TODO finish this part
+app.use(function(req, res,next) {
+    console.log("");
+    console.log("<<Access to " + req.url + ">>");
+    console.log("<<Host name  : " + req.headers.host + ">>");
+  
+    /*
+    var idx = req.headers.host.lastIndexOf(":");
+    var port = req.headers.host.substring(idx + 1, req.headers.host.length);
+    console.log("port number: " + port);
+    */
+    //console.log("test time: " + req.session.cookie.maxAge);
+    next();
+});
+
 app.use(app.router);
 
 app.get('/', routes.index);
-app.get('/users', users.list);
+app.post('/update_hie_record', routes.update_hie_record);
+
+// This is for debugging. Records should not be transmitted as plaintext.
+// This enables to confirm whether the record is inserted correctly
+app.get('/list_hie_record', routes.list_hie_record);
+
+app.post('/authenticate', routes.authenticate);
+app.get('/logout', routes.logout);
+
+app.get('/get_result', routes.get_result);
 
 /// catch 404 and forwarding to error handler
 app.use(function(req, res, next) {
