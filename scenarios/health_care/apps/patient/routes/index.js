@@ -53,17 +53,29 @@ exports.add_user = function(req, res) {
     console.log('cert: ' + req.body.cert);
     console.log('type: ' + req.body.type);
 
-    common.idm.addUser(req.body.name, req.body.cert, function(err, val) {
-        if(err) {
-            console.log("Error in add_user: " + err);
-            res.send("Error while adding user - processing error");
+    // TODO check whether the doctors are already registered or not
+    // TODO if already registered, skip to the request_permission queue step
+    db.get_one_user(req.body.name, function(value) {
+        console.log("Hello length: " + value.length);
+        if(value.length == 0) {
+            common.idm.addUser(req.body.name, req.body.cert, function(err, val) {
+                if(err) {
+                    console.log("Error in add_user: " + err);
+                    res.send("Error while adding user - processing error");
+                }
+                else {
+                    console.log("Adding user done successfully");
+                    res.send("Adding user success!");
+                    add_request_permission_queue(req.body.record_id, req.body.name, parseInt(req.body.type), res);
+                }
+            });
         }
-        else {
-            console.log("Adding user done successfully");
-            res.send("Adding user success!");
+        else if (value.length >= 1) {
+            console.log("This case");
             add_request_permission_queue(req.body.record_id, req.body.name, parseInt(req.body.type), res);
         }
     });
+
     console.log("done");
 };
 
@@ -222,4 +234,9 @@ exports.param_names = function(req, res) {
     db.get_param_names_by_record_id(req.params.id, function(val) {
         res.send(val);
     });
+};
+
+exports.test = function(req, res) {
+    console.log(req);
+    res.redirect('/claimdef/' + req.query.id);
 };

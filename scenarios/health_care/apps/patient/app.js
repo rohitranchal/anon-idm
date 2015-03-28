@@ -48,6 +48,7 @@ app.get('/claims', routes.claims);
 app.post('/claim_service', routes.issue_claim);
 
 app.get('/claimdef/:id', routes.claimdef);
+app.get('/claimdef', routes.test);
 app.get('/param_names/:id', routes.param_names);
 
 /// catch 404 and forwarding to error handler

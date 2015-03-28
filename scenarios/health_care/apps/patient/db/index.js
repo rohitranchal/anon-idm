@@ -25,6 +25,13 @@ exports.get_claimdef_by_name = function(name, cb) {
 
 };
 
+exports.get_one_user = function(name, cb) {
+	connection.query("SELECT * FROM User WHERE name='" + name + "'", function(err, rows, fields) {
+		if (err) throw err;
+		cb(rows);
+	});
+}
+
 // retrieve all user information
 exports.get_all_users = function(cb) {
 	connection.query("SELECT * FROM User", function(err, rows, fields) {
