@@ -33,11 +33,11 @@ app.post('/register_record', routes.register_record);
 app.get('/update_record_page', routes.update_record_page);
 app.post('/update_record', routes.update_record);
 
+app.get('/send_record_page', routes.send_record_page);
+app.post('/send_record', routes.send_record);
 
 /*
 app.get('/list_record');
-app.get('/update_hie_page');
-app.get('/update_hie');
 */
 
 app.get('/get_parameters/:id', routes.get_parameters);

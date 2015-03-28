@@ -1,0 +1,22 @@
+extends layout
+
+block content
+  h1 Send Record to HIE
+
+  form(name="", method="post", action="/send_record")
+    table(border="1" width="320")
+      tr
+        th(width="10")
+        th="id"
+        th="record"
+
+      for record in record_list
+        tr
+          td
+            input(type="radio" name="selection" value=record.id)
+          td=record.id
+          td=record.record
+    
+    br
+    input(type="submit", name="submit", value="submit") 
+

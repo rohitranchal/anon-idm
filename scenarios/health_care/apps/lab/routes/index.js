@@ -2,14 +2,15 @@ var common = require('../common.js');
 var db = require('../db');
 
 /* request in promise format */
-var request = function(method, target) {
+var request = function(method, target, val) {
     return new Promise(function(resolve, reject) {
        if(method.toLowerCase() == 'post') {
-            require('request').post(target, function(error, response, body) {
+            require('request').post(target, val, function(error, response, body) {
                 if(error) reject(error);
                 else resolve({ "response": response, "body": body });
             });
        }
+       // When get is called, 'val' is not used
        else if(method.toLowerCase() == 'get') {
            require('request').get(target, function(error, response, body) {
                if(error) reject(error); 
@@ -47,7 +48,7 @@ exports.register_record = function(req, res) {
     })
     .then(function(result) {
         console.log("success in register_record!");
-        respond("updated!");
+        res.send("updated!");
     }, function(error) {
         console.log("Error in register_record: " + error);
     });
@@ -79,7 +80,6 @@ exports.update_record = function(req, res) {
 
     update_record_info(req.body.selection, req.body.record_content)
     .then(function(result) {
-        console.log("Hello!");
         res.render('update_record', {home_url: 'http://localhost:3003/' , content: "update record success!"});
     },
     function(error) {
@@ -95,6 +95,38 @@ var update_record_info = function(id, record) {
         });
     });
 };
+
+exports.send_record_page = function(req, res) {
+    db.get_all_lab_records()
+    .then(function(result) {
+        console.log(result);
+        res.render('send_record_page', { record_list: result });
+    }, function(error) {
+        console.log(error);
+    });
+}
+
+exports.send_record = function(req, res) {
+    console.log("test1: " + req.body.selection);
+
+    db.get_all_lab_record_pairs(req.body.selection)
+    .then(function(result) {
+        result = result[0]; // remove array form
+        console.log(result);
+        // TODO send post request to the hie 
+        return request('post', 'http://localhost:3004/update_hie_record', 
+            {form: result});
+    }).
+    then(function(result) {
+        console.log("here i am!");
+        console.log("response from post call: " + result.body);
+        res.render('send_record', {home_url: 'http://localhost:3003/' , content: "send record success!"});
+    }, function(error) {
+        console.log(error);
+    });
+};
+
+
 
 
 /* GET: get public params from claimsdefs for record id 

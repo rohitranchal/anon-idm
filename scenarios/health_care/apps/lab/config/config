@@ -6,7 +6,7 @@ private_key_password=idpstore
 
 db_user=root
 db_password=
-db_name=idp
+db_name=lab
 db_host=localhost
 
 same_h1_and_h2=false

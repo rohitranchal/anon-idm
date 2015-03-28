@@ -1,0 +1,14 @@
+doctype html
+html
+  head
+  script(type="text/javascript").
+    home_url = "#{home_url}";
+    function redirect() {
+        setTimeout(function() {
+            window.location.href = home_url;
+        }, 3000);
+    }
+
+  body(onload="redirect()").
+    #{content}
+
