@@ -30,6 +30,7 @@ public class Lab {
 	 * @throws	Exception
 	 */
 	public String extractPublicParams(String claimdef) throws Exception {
+		System.out.println(claimdef);
 		String params = null;
 		
 		ObjectMapper mapper = new ObjectMapper();
