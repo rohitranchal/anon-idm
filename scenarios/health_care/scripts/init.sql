@@ -1,3 +1,4 @@
+# Initialization for patient databases
 CREATE DATABASE IF NOT EXISTS idp;
 
 USE idp;
@@ -57,13 +58,29 @@ CREATE TABLE RecordPair (
     PRIMARY KEY(RecordId, ReadName)
 );
 
+# Initialization for lab databases
 CREATE DATABASE IF NOT EXISTS lab;
 
 USE lab;
-DROP TABLE IF EXISTS Record;
-CREATE TABLE Record (
-    RecordId VARCHAR(256) NOT NULL PRIMARY KEY,
-    ParamOwner TEXT NOT NULL,
-    ParamRead TEXT NOT NULL,
-    Record TEXT NOT NULL
+
+DROP TABLE IF EXISTS LabRecord;
+CREATE TABLE LabRecord (
+    id MEDIUMINT NOT NULL PRIMARY KEY AUTO_INCREMENT, # id in the lab
+    ParamOwner TEXT NOT NULL,       # ParamOwner
+    ParamRead TEXT NOT NULL,        # ParamRead
+    Record TEXT NOT NULL            # Medical Result
 );
+
+# Initialization for hie databases
+CREATE DATABASE IF NOT EXISTS hie;
+
+USE hie;
+
+DROP TABLE IF EXISTS HieRecord;
+CREATE TABLE HieRecord (
+    GParam VARCHAR(512) NOT NULL PRIMARY KEY,   # hash g in the parameter
+    ParamOwner TEXT NOT NULL,           # ParamOwner
+    ParamRead TEXT NOT NULL,            # ParamRead
+    Record TEXT NOT NULL                # Medical Result
+);
+
