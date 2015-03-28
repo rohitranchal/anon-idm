@@ -5,3 +5,10 @@ block content
   p Welcome to #{title}
   a(href='/req_permission_page') Request Permission
   br
+  a(href='/authenticate_hie_page') Authenticate HIE
+  br
+  p Following can be used only when logged in.
+  p #{login_status}
+  a(href='/get_data') get result
+  br
+  a(href='/logout') logout

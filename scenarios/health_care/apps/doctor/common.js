@@ -23,18 +23,21 @@ java.classpath.push(jars_dir + "lib/httpclient-4.3.jar");
 java.classpath.push(jars_dir + "lib/httpcore-4.3.jar");
 java.classpath.push(jars_dir + "lib/commons-logging-1.1.3.jar");
 java.classpath.push(jars_dir + "lib/idp-1.0-SNAPSHOT.jar");
-java.classpath.push(jars_dir + "healthcare-1.0-SNAPSHOT.jar");
+java.classpath.push(jars_dir + "healthcare-0.1-SNAPSHOT.jar");
 
 var keystore_dir = require('path').dirname(process.mainModule.filename) + "/keystore";
 console.log("Setting keystore_dir: " + keystore_dir);
 var wallet_dir = require('path').dirname(process.mainModule.filename) + "/wallet";
 console.log("Setting wallet_dir: " + wallet_dir);
 
-var Client = java.import('org.ruchith.research.idm.user.Client');
-var client = new Client(wallet_dir);
+var Doctor = java.import('org.ruchith.research.scenarios.healthcare.consumer.Doctor');
+var doctor = new Doctor(wallet_dir);
 
-exports.client = client;
+var promise = require('promise');
+
+exports.doctor = doctor;
 exports.java = java;
 exports.wallet_dir = wallet_dir;
 exports.keystore_dir = keystore_dir;
 exports.keystore_pass = 'bobkey';
+exports.promise = promise;

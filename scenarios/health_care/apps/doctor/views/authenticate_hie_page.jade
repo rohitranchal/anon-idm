@@ -1,0 +1,21 @@
+extends layout
+
+block content
+  h1 Choose what to authenticate
+
+  form(name="", method="post", action="/authenticate_hie")
+    table(border="1" width="320")
+      tr
+        th(width="10")
+        th="id"
+        th="record"
+
+      for def in def_list
+        tr
+          td
+            input(type="radio" name="selection" value=def)
+          td=def
+          td
+    
+    br
+    input(type="submit", name="submit", value="submit") 
