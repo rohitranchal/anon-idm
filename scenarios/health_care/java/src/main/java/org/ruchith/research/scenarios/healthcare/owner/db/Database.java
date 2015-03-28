@@ -35,7 +35,7 @@ public class Database {
 	}
 	
 	public void updateRequestRegisterationStatus(String recordId, String name, boolean registered) throws Exception {
-		String sql = "UPDATE RequestPermission SET Registered=" + registered;
+		String sql = "UPDATE RequestPermission SET Registered=" + registered + " WHERE RecordId='" + recordId +"'";
 		con.createStatement().execute(sql);
 	}
 	
