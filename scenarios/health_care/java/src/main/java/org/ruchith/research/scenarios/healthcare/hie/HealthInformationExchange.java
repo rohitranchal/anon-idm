@@ -1,6 +1,10 @@
 package org.ruchith.research.scenarios.healthcare.hie;
 
 // TODO make own class
+import java.io.ByteArrayInputStream;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
+
 import it.unisa.dia.gas.jpbc.Element;
 
 import org.ruchith.research.idm.IdentityClaimDefinition;
@@ -14,6 +18,8 @@ import org.codehaus.jackson.node.ObjectNode;
 import org.ruchith.ae.base.AECipherTextBlock;
 import org.ruchith.ae.base.AEParameters;
 import org.ruchith.ae.base.Encrypt;
+
+import org.ruchith.research.scenarios.healthcare.Util;
 
 /**
  * 
@@ -90,5 +96,12 @@ public class HealthInformationExchange extends ServiceProvider {
 		on.put("SessionKey", sk);
 
 		return on.toString();
+	}
+	
+	public boolean verifySig(String content, String recvCert, String recvSig) 
+		throws Exception {
+		CertificateFactory factory = CertificateFactory.getInstance("X.509");
+		Certificate cert = factory.generateCertificate(new ByteArrayInputStream(recvCert.getBytes()));
+		return Util.verifyB64Sig(content, cert, recvSig);
 	}
 }
