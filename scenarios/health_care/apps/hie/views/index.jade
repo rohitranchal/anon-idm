@@ -1,5 +1,11 @@
 extends layout
 
 block content
-  h1= title
-  a(href='/list_hie_record') List hie record (Debug Purpose)
+  p Welcome to #{title}
+
+  div(class="list-group")
+    a(class="list-group-item", href='/list_hie_record') List hie record (Debug Purpose)
+
+
+
+
