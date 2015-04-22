@@ -47,6 +47,7 @@ CREATE TABLE RequestPermission (
     Name VARCHAR(256) NOT NULL,
     Type TINYINT UNSIGNED NOT NULL,
     Registered BOOLEAN NOT NULL DEFAULT FALSE,
+    ReqSrcUrl VARCHAR(256) NOT NULL,
     PRIMARY KEY(RecordId, Name)
 );
 
