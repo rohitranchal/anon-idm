@@ -20,9 +20,9 @@ public class Patient extends IdentityManager {
 		this.db = Database.getInstance(this.config.getDbHost(), this.config.getDbUser(), this.config.getDbPassword());
 	}
 	
-	public void addRequestPermissionQueue(String recordId, String name, int type) 
+	public void addRequestPermissionQueue(String recordId, String name, int type, String srcUrl) 
 		throws Exception {
-		db.addRequestPermission(recordId, name, type);
+		db.addRequestPermission(recordId, name, type, srcUrl);
 	}
 	
 	public void updateRegisteration(String recordId, String name, boolean registered)

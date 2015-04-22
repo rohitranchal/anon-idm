@@ -28,9 +28,9 @@ public class Database {
 		return db;
 	}
 	
-	public void addRequestPermission(String recordId, String name, int type) throws Exception {
-		String sql = "INSERT INTO RequestPermission(RecordId, Name, Type) VALUES" +
-				"('" + recordId + "','" + name + "','" + type + "')";
+	public void addRequestPermission(String recordId, String name, int type, String srcUrl) throws Exception {
+		String sql = "INSERT INTO RequestPermission(RecordId, Name, Type, ReqSrcUrl) VALUES" +
+				"('" + recordId + "','" + name + "','" + type + "','" + srcUrl + "')";
 		con.createStatement().execute(sql);
 	}
 	
