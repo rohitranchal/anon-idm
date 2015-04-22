@@ -31,7 +31,7 @@ exports.index = function(req, res){
 /* GET: get register_record_page */
 exports.register_record_page = function(req, res) {
     console.log('register_record_page is called');
-    res.render('register_record_page');
+    res.render('register_record_page', { title: "Register Record" });
 }
 
 exports.register_record = function(req, res) {
@@ -48,7 +48,7 @@ exports.register_record = function(req, res) {
     })
     .then(function(result) {
         console.log("success in register_record!");
-        res.send("updated!");
+        res.render('response_result', { redirect_url: "http://localhost:3003", result_msg: "Updated!"});
     }, function(error) {
         console.log("Error in register_record: " + error);
     });
@@ -80,7 +80,7 @@ exports.update_record = function(req, res) {
 
     update_record_info(req.body.selection, req.body.record_content)
     .then(function(result) {
-        res.render('update_record', {home_url: 'http://localhost:3003/' , content: "update record success!"});
+        res.render('response_result', { redirect_url: 'http://localhost:3003/' , result_msg: "update record success!"});
     },
     function(error) {
         console.log(error);
@@ -112,6 +112,10 @@ exports.send_record = function(req, res) {
     db.get_all_lab_record_pairs(req.body.selection)
     .then(function(result) {
         result = result[0]; // remove array form
+
+        // TODO temporary action
+        result.record = new Buffer(result.record).toString('base64');
+
         console.log(result);
         // TODO send post request to the hie 
         return request('post', 'http://localhost:3004/update_hie_record', 
@@ -120,14 +124,11 @@ exports.send_record = function(req, res) {
     then(function(result) {
         console.log("here i am!");
         console.log("response from post call: " + result.body);
-        res.render('send_record', {home_url: 'http://localhost:3003/' , content: "send record success!"});
+        res.render('response_result', {redirect_url: 'http://localhost:3003/' , result_msg: "send record success!"});
     }, function(error) {
         console.log(error);
     });
 };
-
-
-
 
 /* GET: get public params from claimsdefs for record id 
  */
@@ -164,16 +165,37 @@ exports.get_parameters = function(req, res) {
 };
 
 var get_claim_and_extract_public_params = function(name) {
+    var curr_claimdef;
+    // fetch claimdef
     return request('get', 'http://localhost:3001/claimdef/' + name)
         .then(function(result) {
-            console.log(result.body);
-            return extract_public_params_promise(result.body);
+            curr_claimdef = result.body;
+            console.log(curr_claimdef);
+            // fetch cert
+            return request('get', 'http://localhost:3001/cert/');
+        })
+        .then(function(result) {
+            var fetched_cert = result.body;
+            console.log(fetched_cert);
+            // verify claimdef
+            return verify_claimdef(fetched_cert, curr_claimdef);
+        })
+        .then(function(result) {
+            var is_valid = result;
+            if(!Boolean(is_valid)) {
+                throw new Error("Invalid claimdef!");
+            }
+            else {
+                // When valid claim arrives, extract params
+                console.log("Valid claimdef!");
+                return JSON.parse(curr_claimdef).params;
+            }
         });
 };
 
-var extract_public_params_promise = function(ip) {
+var verify_claimdef = function(cert, claimdef) {
     return new Promise(function(resolve, reject) {
-        common.lab.extractPublicParams(ip, function(err, res) {
+        common.lab.verifyClaimdef(cert, claimdef, function(err, res) {
             if(err) reject(err);
             else resolve(res);
         });
