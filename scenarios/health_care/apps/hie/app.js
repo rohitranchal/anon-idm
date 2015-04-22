@@ -57,6 +57,7 @@ app.post('/update_hie_record', routes.update_hie_record);
 app.get('/list_hie_record', routes.list_hie_record);
 
 app.post('/authenticate', routes.authenticate);
+app.post('/check_hash_validity', routes.check_hash_validity);
 app.get('/logout', routes.logout);
 
 app.get('/get_result', routes.get_result);

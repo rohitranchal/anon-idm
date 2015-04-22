@@ -78,15 +78,18 @@ exports.authenticate = function(req, res) {
         var result_json = JSON.parse(result);
         console.log("[SessionKey    ]: " + result_json.SessionKey);
         console.log("[Anonoymous    ]: " + result_json.Anonymous);
-        console.log("[authenticate success! ]");
 
         // Allocate session
         req.session.regenerate(function() {
             req.session.g = user_g;
+            req.session.key = result_json.SessionKey;
             console.log("[[Session] g is inserted into session]: " + user_g);
+            console.log("Test here: " + result_json.SessionKey);
+            console.log("Test second: " + result_json.Anonymous);
             res.send(result_json.Anonymous);
         });
     }, function(error) {
+        // TODO if already session is created, destroy
         console.log("[authenticate error    ]: " + error);
         res.send("Error in authenticate");
     });
@@ -102,6 +105,72 @@ var create_challange = function(request, param) {
     });
 }
 
+exports.check_hash_validity = function(req, res) {
+    var user_g = req.body.g;
+    var recv_dgst = req.body.dgst;
+    var recv_sig = req.body.sig;
+    var recv_cert = req.body.cert;
+    
+    // confirming mechanism
+    console.log("[authenticate success! ]");
+    console.log("user g: " + user_g);
+    console.log("dgst: " + recv_dgst);
+    console.log("sig: " + recv_sig);
+    console.log("cert: " + recv_cert);
+
+    var curr_key = req.session.key;
+    console.log("curret Session key: " + curr_key);
+    console.log(req.session.key);
+
+    verify_session_dgst(curr_key, recv_dgst)
+    .then(function(is_valid_dgst) {
+        console.log("is valid dgst: " + is_valid_dgst);
+        if(!is_valid_dgst) {
+            // TODO: destory session
+            res.send("Failed");
+        }
+        else {
+           return verify_session_sig(curr_key, recv_cert, recv_sig);
+        }
+    })
+    .then(function(is_valid_sig) {
+        console.log("is valid sig: " + is_valid_sig);
+        if(!is_valid_sig) {
+            // TODO: destroy session
+            res.send("Failed");
+        }
+        else {
+            res.send("Authenticated");
+        }
+    }, function(err) {
+        console.log("Helloooooooo!");
+        res.send("Error in checking validity\n" + err);
+    });
+
+
+};
+
+
+var verify_session_dgst = function(content, recvDgst) {
+    return new Promise(function(resolve, reject) {
+        common.java.callStaticMethod('org.ruchith.research.scenarios.healthcare.Util', 'verifyB64Dgst', content, recvDgst,
+            function(err, res) {
+                if(err) reject(err);
+                else resolve(res);
+            });
+    });
+};
+
+var verify_session_sig = function(content, recvCert, recvSig) {
+    return new Promise(function(resolve, reject) {
+        common.hie.verifySig(content, recvCert, recvSig, function(err, res) {
+            if(err) reject(err);
+            else resolve(res);
+        });
+    });
+};
+
+
 exports.get_result = function(req, res) {
     if(!req.session.g) {
     }
@@ -110,13 +179,28 @@ exports.get_result = function(req, res) {
         db.get_result_by_g(req.session.g)
         .then(function(result) {
             console.log(result);
-            res.send(result.Record);
+            return create_encrypted_result(result.Record, req.session.key);
+        })
+        .then(function(result) {
+            console.log("Encrypted: " + result);
+            res.send(result);
         },
         function(error) {
             console.log(error);
         });
     }
 }
+
+var create_encrypted_result = function(plaintext, sessionkey) {
+    return new Promise(function(resolve, reject) {
+        common.java.callStaticMethod('org.ruchith.research.scenarios.healthcare.Util', 'encrypt', plaintext, sessionkey,
+            function(err, res) {
+                if(err) reject(err);
+                else resolve(res);
+            });
+    });
+};
+
 
 // TODO cookie handling
 exports.logout = function(req, res) {
