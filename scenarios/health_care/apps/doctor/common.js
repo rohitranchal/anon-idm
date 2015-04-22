@@ -35,9 +35,26 @@ var doctor = new Doctor(wallet_dir);
 
 var promise = require('promise');
 
+// export java related vars
 exports.doctor = doctor;
 exports.java = java;
-exports.wallet_dir = wallet_dir;
-exports.keystore_dir = keystore_dir;
-exports.keystore_pass = 'bobkey';
+
+// export promise
 exports.promise = promise;
+
+// export dir locations
+exports.keystore_dir = keystore_dir;
+exports.wallet_dir = wallet_dir;
+
+// export user settings: this must be provided before execution
+// [Certificate]
+// The format for certificate file name is "id.cert"
+exports.certname = "alice.cert"
+// [Keystore]
+// The format for keystore file name is "id.jks"
+exports.id = 'alice'
+exports.keystore_file = 'alice.jks';
+exports.keystore_pass = 'alicekey';
+exports.alias = 'alice';
+exports.privatekey_pass = 'alicekey';
+exports.self_domain = 'localhost';
