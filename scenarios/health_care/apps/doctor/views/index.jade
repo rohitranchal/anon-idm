@@ -1,14 +1,17 @@
 extends layout
 
 block content
-  h1= title
   p Welcome to #{title}
-  a(href='/req_permission_page') Request Permission
-  br
-  a(href='/authenticate_hie_page') Authenticate HIE
-  br
-  p Following can be used only when logged in.
-  p #{login_status}
-  a(href='/get_data') get result
-  br
-  a(href='/logout') logout
+
+  ul(class="list-group")
+    li(class="list-group-item list-group-item-info") 
+      strong Status: 
+      | #{login_status}
+
+  div(class="list-group")
+    a(class="list-group-item" href="/req_permission_page") Request Permission
+    a(class="list-group-item" href="/authenticate_hie_page") Authenticate HIE
+    //- TODO: Need to change this one: imporvements
+    if login_status != "Not logged in"
+      a(class="list-group-item" href="/get_data") Get result
+      a(class="list-group-item" href="/logout") Logout
