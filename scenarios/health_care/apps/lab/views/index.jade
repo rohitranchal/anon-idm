@@ -1,12 +1,12 @@
 extends layout
 
 block content
-  h1= title
   p Welcome to #{title}
 
-  a(href='/register_record_page') Register record
-  br
-  a(href='/update_record_page') Update record
-  br
-  a(href='/send_record_page') Send record to HIE
-  br
+  div(class="list-group")
+    a(class="list-group-item" href="/register_record_page")
+      | Register record
+    a(class="list-group-item" href="/update_record_page")
+      | Update record
+    a(class="list-group-item" href="send_record_page")
+      | Send record to HIE
