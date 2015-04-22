@@ -27,6 +27,16 @@ console.log("Setting config_dir: " + config_dir);
 var Patient = java.import('org.ruchith.research.scenarios.healthcare.owner.Patient');
 var idm = new Patient(config_dir);
 
+var promise = require('promise');
+
+// export java related vars
 exports.idm = idm;
 exports.java = java;
+
+// export dir locations
 exports.config_dir = config_dir;
+
+// export promise
+exports.promise = promise;
+
+exports.self_domain = 'localhost';

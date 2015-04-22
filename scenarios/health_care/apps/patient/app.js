@@ -11,6 +11,7 @@ var users = require('./routes/user');
 
 var app = express();
 app.listen(3001, function() {
+    app.this_http_port = 3001;
     console.log("Patient's app is listening to port 3001");
 });
 
