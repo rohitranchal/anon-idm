@@ -1,0 +1,17 @@
+extends layout
+
+block content
+  table(class="table claimdef-table")
+    tr
+      th='Name'
+      th='Descriptions'
+      th='params'
+      th='Date created'
+
+    for def in claimdef_list
+      tr
+        td=def.name
+        td=def.description
+        td=def.params
+        td=def.DateCreated
+

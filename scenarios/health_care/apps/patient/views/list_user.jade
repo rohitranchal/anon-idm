@@ -1,12 +1,11 @@
 extends layout
 
 block content
-  h1= title
-  table(border="1")
+  table(class="table")
     tr
       th='Name'
-      th='Certificate Fingerprint'
-      th='Date Created'
+      th='Certificate fingerprint'
+      th='Date created'
 
     for user in user_list
       tr

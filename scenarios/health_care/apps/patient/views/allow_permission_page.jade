@@ -1,22 +1,23 @@
 extends layout
 
 block content
-  h1 Allow Permission
   form(name="", method="post", action="/allow_permission")
-    table(border="1")
-      tr
-        th=""
-        th="Name"
-        th="Record Id"
-
-      for user in user_list
+    div(class="form-group")
+      table(class="table table-hover")
         tr
-          td
-            input(type="radio" name="selection" value=user.Name + "_" + user.RecordId)
-          td=user.Name
-          td=user.RecordId
+          th=""
+          th="Name"
+          th="Record Id"
 
-    input(type="submit", name="submit", value="submit")
+        for user in user_list
+          tr
+            td
+              input(type="radio" name="selection" value=user.Name + "_" + user.RecordId)
+            td=user.Name
+            td=user.RecordId
+
+    div(class="text-center")
+      input(type="submit", name="submit", value="submit" class="btn btn-default")
 
 
     

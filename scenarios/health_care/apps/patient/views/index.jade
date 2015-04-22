@@ -1,14 +1,15 @@
 extends layout
 
 block content
-  h1= title
   p Welcome to #{title}
 
-  a(href='/add_claimdef_page') Create new claim definition
-  br
-  a(href='/list_claimdef') List claim definition
-  br
-  a(href='/allow_permission_page') Allow permission 
-  br
-  a(href='/list_user') List users
-  br
+  div(class="list-group")
+    //- a(class="list-group-item" href="/add_claimdef_page")
+      h4(class="list-group-item-heading") Create new claim definition
+      p(class="list-group-item-text") This creates new claim definition
+    a(class="list-group-item" href="/allow_permission_page")
+      | Allow permission
+    a(class="list-group-item" href="/list_claimdef")
+      | List claim definition
+    a(class="list-group-item" href="/list_user")
+      | List users
