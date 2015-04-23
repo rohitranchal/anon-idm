@@ -1,9 +1,14 @@
 1. How to execute the program 
     (a) After setting path in health_care.cfg, execute ./configure.py
-    (b) In each directory
+    (b) In doctor application, different cert and keystore can be set in common.js
+    (c) In each applications execute with the following command
         node app.js
+        
+        cf) doctor can be given extra argument
+            node app.js [portnum for doctor app]
 
 2. Program structure
    (a) java
    (b) apps: node.js applications
-     apps
+       Four party is implemented
+         Patient, doctor, lab, hie(health information exchange)
