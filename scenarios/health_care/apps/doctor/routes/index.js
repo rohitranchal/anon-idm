@@ -302,14 +302,18 @@ exports.get_data = function(req, res) {
         console.log("Halo?");
         request_promise('get', 'http://localhost:3004/get_result', null, req.session.hie_cookie)
         .then(function(result) {
-            encrypted_data = result.body;
+            console.log("response from get_result");
+            console.log(result.body);
+            result_json = JSON.parse(result.body);
+            console.log(result_json);
+            encrypted_data = result_json.encrypted_data;
             console.log("Encrypted: " + encrypted_data);
             return decrypted_result(encrypted_data, curr_key);
         })
         .then(function(result) {
             // Decode base64 encoded string
             decrypted_data = new Buffer(result, 'base64').toString();
-            res.render("get_data", { title: "Result", encrypted_result: encrypted_data, decrypted_result: decrypted_data });
+            res.render("get_data", { title: "Result", encrypted_result: encrypted_data, decrypted_result: decrypted_data, req: result_json.req });
         }, function(error) {
             console.log("error " + error);
         });

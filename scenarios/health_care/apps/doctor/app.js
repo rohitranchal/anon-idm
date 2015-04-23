@@ -17,13 +17,14 @@ if(process.argv.length == 2) {
         console.log("doctor's app is listening to port 3002");
     });
 }
-else if(process.argv.length == 4) {
+else if(process.argv.length == 3) {
     // TODO maybe setting app.locals.http_port might be needed
     // or app.this_http_port
     var target_http_port = parseInt(process.argv[2]);
-    var target_https_port = parseInt(process.argv[3]);
+    //var target_https_port = parseInt(process.argv[3]);
+    app.this_http_port = target_http_port;
     console.log("HTTP Port : " + target_http_port);
-    console.log("HTTPS Port: " + target_https_port);
+    //console.log("HTTPS Port: " + target_https_port);
 
 /*
 npm install --save secure-random // version 1.1.1

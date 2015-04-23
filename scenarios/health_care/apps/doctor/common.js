@@ -49,12 +49,12 @@ exports.wallet_dir = wallet_dir;
 // export user settings: this must be provided before execution
 // [Certificate]
 // The format for certificate file name is "id.cert"
-exports.certname = "alice.cert"
+exports.certname = "bob.cert"
 // [Keystore]
 // The format for keystore file name is "id.jks"
-exports.id = 'alice'
-exports.keystore_file = 'alice.jks';
-exports.keystore_pass = 'alicekey';
-exports.alias = 'alice';
-exports.privatekey_pass = 'alicekey';
+exports.id = 'bob'
+exports.keystore_file = 'bob.jks';
+exports.keystore_pass = 'bobkey';
+exports.alias = 'bob';
+exports.privatekey_pass = 'bobkey';
 exports.self_domain = 'localhost';
