@@ -23,10 +23,10 @@ public class Database {
 	}
 	
 
-	public void storeIdAndParams(String ownerParam, String readParam) 
+	public void firstRecord(String prescriptionId, String ownerParam, String readParam) 
 			throws Exception {
-		String sql = "INSERT INTO LabRecord(ParamOwner, ParamRead, Record) VALUES" +
-					"('" + ownerParam + "','" + readParam + "','')";
+		String sql = "INSERT INTO LabRecord(PrescriptionId, ParamOwner, ParamRead, Record) VALUES" +
+					"('" + prescriptionId + "','" + ownerParam + "','" + readParam + "','')";
 		con.createStatement().execute(sql);
 	}
 	

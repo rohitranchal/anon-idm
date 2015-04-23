@@ -135,9 +135,9 @@ public class Lab {
 	 * @param readParam
 	 * @throws Exception
 	 */
-	public void initRecord(String ownerParam, String readParam) 
+	public void initRecord(String prescriptionId, String ownerParam, String readParam) 
 			throws Exception {
-		db.storeIdAndParams(ownerParam, readParam);
+		db.firstRecord(prescriptionId, ownerParam, readParam);
 	}
 	
 	public void updateRecord(String id, String Record) 

@@ -2,6 +2,11 @@ package org.ruchith.research.scenarios.healthcare.owner.db;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
+
+import org.bouncycastle.util.encoders.Base64;
+import org.codehaus.jackson.node.ObjectNode;
+import org.ruchith.research.idm.IdentityClaimDefinition;
 
 /**
  * 
@@ -44,4 +49,26 @@ public class Database {
 				"('" + recordId + "','" + ownerName + "','" + readName + "')";
 		con.createStatement().execute(sql);
 	}
+	
+	public void updateClaimdef() {
+	}
+	
+	public void updateClaimDefinition(IdentityClaimDefinition claimDef)
+			throws Exception {
+		ObjectNode json = claimDef.getParams().serializeJSON();
+		byte[] paramsJsonBytes = json.toString().getBytes();
+		String sql =
+				"UPDATE Claim_Definition SET PrivateKey='" + new String(Base64.encode(claimDef.getMasterKey().toBytes()))
+				+ "', PublicParams='" +  new String(Base64.encode(paramsJsonBytes))
+				+ "', Digest='" + claimDef.getB64Hash()
+				+ "', Sig='" + claimDef.getB64Sig()
+				+ "' WHERE Name='" + claimDef.getName() + "'";
+		con.createStatement().execute(sql);
+	}	
+	
+	public ResultSet getClaims(String name) throws Exception {
+		String sql = "SELECT * From Claim";
+		return con.createStatement().executeQuery(sql);
+	}
+	
 }

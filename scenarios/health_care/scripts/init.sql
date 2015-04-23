@@ -67,6 +67,7 @@ USE lab;
 DROP TABLE IF EXISTS LabRecord;
 CREATE TABLE LabRecord (
     id MEDIUMINT NOT NULL PRIMARY KEY AUTO_INCREMENT, # id in the lab
+    PrescriptionId TEXT NOT NULL,   # Prescription Id
     ParamOwner TEXT NOT NULL,       # ParamOwner
     ParamRead TEXT NOT NULL,        # ParamRead
     Record TEXT NOT NULL            # Medical Result
