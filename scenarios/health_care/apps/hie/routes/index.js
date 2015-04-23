@@ -83,9 +83,11 @@ exports.authenticate = function(req, res) {
         req.session.regenerate(function() {
             req.session.g = user_g;
             req.session.key = result_json.SessionKey;
+            req.session.user_req = user_req;
             console.log("[[Session] g is inserted into session]: " + user_g);
-            console.log("Test here: " + result_json.SessionKey);
-            console.log("Test second: " + result_json.Anonymous);
+            console.log("Session key used: " + result_json.SessionKey);
+            console.log("Anonymous: " + result_json.Anonymous);
+            console.log("Req used: " + user_req);
             res.send(result_json.Anonymous);
         });
     }, function(error) {
@@ -182,8 +184,11 @@ exports.get_result = function(req, res) {
             return create_encrypted_result(result.Record, req.session.key);
         })
         .then(function(result) {
+
             console.log("Encrypted: " + result);
-            res.send(result);
+            var req_and_data = {encrypted_data: result, req: req.session.user_req };
+            console.log(req_and_data);
+            res.send(req_and_data);
         },
         function(error) {
             console.log(error);
