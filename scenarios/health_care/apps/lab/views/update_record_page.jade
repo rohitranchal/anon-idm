@@ -9,6 +9,7 @@ block content
         tr
           th(width="10")
           th="Record id"
+          th="Prescription id"
           th="Current record's content"
 
         for record in record_list
@@ -16,6 +17,7 @@ block content
             td
               input(type="radio" name="selection" value=record.id)
             td=record.id
+            td=record.pid
             td=record.record
     
       textarea(rows="15" cols="50" name="record_content" class="form-control")

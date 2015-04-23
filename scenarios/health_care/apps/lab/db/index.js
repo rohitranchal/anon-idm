@@ -13,7 +13,7 @@ var promise = require('promise');
 /* get lab identifier and record */
 exports.get_all_lab_records = function() {
     return new Promise(function(resolve, reject) {
-        connection.query("SELECT Id as id, Record as record FROM LabRecord", 
+        connection.query("SELECT Id as id, PrescriptionId as pid, Record as record FROM LabRecord", 
             function(error, rows, fields) {
                 if(error) reject(error);
                 else resolve(rows);

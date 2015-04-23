@@ -36,15 +36,16 @@ exports.register_record_page = function(req, res) {
 
 exports.register_record = function(req, res) {
     console.log('register_record is called');
-    console.log('record id: ' + req.body.record_id); 
+    var presc_id = req.body.record_id;
+    console.log('record id: ' + presc_id); 
 
     // TODO SELF 
-    request('get', 'http://localhost:3003/get_parameters/' + req.body.record_id)
+    request('get', 'http://localhost:3003/get_parameters/' + presc_id)
     .then(function(result) {
         var params = JSON.parse(result.body);
         console.log("Owner: " + params.owner);
         console.log("Read: " + params.read);
-        return insert_new_empty_record(params.owner, params.read);
+        return insert_new_empty_record(presc_id, params.owner, params.read);
     })
     .then(function(result) {
         console.log("success in register_record!");
@@ -55,9 +56,9 @@ exports.register_record = function(req, res) {
 
 }
 
-var insert_new_empty_record = function(own, read) {
+var insert_new_empty_record = function(p_id, own, read) {
     return new Promise(function(resolve, reject) {
-        common.lab.initRecord(own, read, function(err, res) {
+        common.lab.initRecord(p_id, own, read, function(err, res) {
             if(err) reject(err);
             else resolve(res);
         });
