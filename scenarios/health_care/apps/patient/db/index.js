@@ -48,6 +48,14 @@ exports.get_unregistered_requests = function(cb) {
     });
 }
 
+exports.get_registered_requests = function(cb) {
+    connection.query("SELECT * From RequestPermission where Registered=True", 
+    function(err, rows, fields) {
+        if(err) throw err;
+        cb(rows);
+    });
+}
+
 exports.get_req_src_url = function(name, id, cb) {
     connection.query("SELECT ReqSrcUrl From RequestPermission where name='" + name + "' and RecordId='" + id +"'",
     function(err, rows, fields) {

@@ -43,6 +43,9 @@ app.post('/add_user', routes.add_user);
 app.get('/allow_permission_page', routes.allow_permission_page);
 app.post('/allow_permission', routes.allow_permission);
 
+app.get('/revocate_user_page', routes.revocate_user_page);
+app.post('/revocate_user', routes.revocate_user);
+
 app.get('/cert/', routes.cert);
 app.get('/claims', routes.claims);
 // TODO change name...?

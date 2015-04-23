@@ -246,6 +246,47 @@ var update_record_pair = function(record_id, owner_claim_name, read_claim_name) 
     });
 };
 
+exports.revocate_user_page = function(req, res) {
+    console.log('revocate_user_page is called');
+    db.get_registered_requests (function(val) {
+        res.render('revocate_user_page', { title: 'Revocate User', user_list : val });
+    });
+};
+
+exports.revocate_user = function(req, res) {
+    console.log('revocate_user is called');
+    console.log('revocate_user value: ' + req.body.selection);
+
+    var name_and_record_id = req.body.selection.split("_");
+
+    var name = name_and_record_id[0];
+    var record_id = name_and_record_id[1];
+
+    var read_claim_name = record_id + "_read";
+
+    var prev_param, new_param;
+    
+    db.get_claimdef_by_name(read_claim_name, function(val) {
+        new_param = val.params;
+        retrieve_revocate_info(val.name, val.params)
+        .then(function(val) {
+        }, function(err) {
+            console.log("errors:" + err);
+        });
+    });
+};
+
+
+var retrieve_revocate_info = function(name, params) {
+    return new Promise(function(resolve, reject) {
+        common.idm.retrieveRevocateInfo(name, params, function(err, res) {
+            if(err) reject(err);
+            else resolve(res);
+        });
+    });
+};
+
+
 // TODO another improvement?
 exports.cert = function(req, res) {
     console.log("cert is called");
