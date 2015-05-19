@@ -208,6 +208,11 @@ public class IdentityManager {
 		RootKeyGen rkg = new RootKeyGen();
 		rkg.init(claimDef.getParams());
 		Element r = claimDef.getParams().getPairing().getZr().newRandomElement();
+		
+		// Store claim
+		// This is the temporary action
+		this.db.storeClaim(claimName, user, r, anonId);
+		
 		AEPrivateKey pk = rkg.genAnonKey(anonId, claimDef.getMasterKey(), r);
 
 		// TODO : Apply policy
@@ -215,8 +220,7 @@ public class IdentityManager {
 		IdentityClaim claim = new IdentityClaim();
 		claim.setClaim(pk);
 
-		// Store claim
-		this.db.storeClaim(claimName, user, r, anonId);
+
 
 		// TODO Encrypt
 
