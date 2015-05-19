@@ -40,7 +40,7 @@ public class Database {
 	}
 	
 	public void updateRequestRegisterationStatus(String recordId, String name, boolean registered) throws Exception {
-		String sql = "UPDATE RequestPermission SET Registered=" + registered + " WHERE RecordId='" + recordId +"'";
+		String sql = "UPDATE RequestPermission SET Registered=" + registered + " WHERE RecordId='" + recordId +"' and Name='" + name + "'";
 		con.createStatement().execute(sql);
 	}
 	
@@ -48,9 +48,6 @@ public class Database {
 		String sql = "INSERT INTO RecordPair(RecordId, OwnerName, ReadName) VALUES" +
 				"('" + recordId + "','" + ownerName + "','" + readName + "')";
 		con.createStatement().execute(sql);
-	}
-	
-	public void updateClaimdef() {
 	}
 	
 	public void updateClaimDefinition(IdentityClaimDefinition claimDef)
@@ -64,11 +61,21 @@ public class Database {
 				+ "', Sig='" + claimDef.getB64Sig()
 				+ "' WHERE Name='" + claimDef.getName() + "'";
 		con.createStatement().execute(sql);
-	}	
+	}
 	
 	public ResultSet getClaims(String name) throws Exception {
-		String sql = "SELECT * From Claim";
+		String sql = "SELECT * From Claim WHERE ClaimName='" + name + "'";
 		return con.createStatement().executeQuery(sql);
+	}
+	
+	public void removeClaim(String name, String username) throws Exception {
+		String sql = "DELETE FROM Claim WHERE ClaimName='" + name + "' and UserName='" + username +"'";
+		con.createStatement().execute(sql);
+	}
+	
+	public void revocateRequestRegisteration(String recordId, String name) throws Exception {
+		String sql = "UPDATE RequestPermission SET Revocated=" + true + " WHERE RecordId='" + recordId +"' and Name='" + name + "'";
+		con.createStatement().execute(sql);
 	}
 	
 }

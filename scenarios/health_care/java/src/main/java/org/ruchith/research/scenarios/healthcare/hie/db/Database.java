@@ -3,6 +3,8 @@ package org.ruchith.research.scenarios.healthcare.hie.db;
 import java.sql.Connection;
 import java.sql.DriverManager;
 
+import org.bouncycastle.util.encoders.Base64;
+
 public class Database {
 	private static Database db;
 	private static Connection con;
@@ -35,5 +37,19 @@ public class Database {
 				"('" + g + "','" + ownerParam + "','" + readParam + "','" + Record + "')";
 		con.createStatement().execute(sql);
 	}
-
+	
+	public void updatePublicParam(String g, String param)
+		throws Exception {
+		String sql =
+				"UPDATE HieRecord SET ParamRead='" + param
+				+ "' WHERE GParam='" + g + "'";
+		con.createStatement().execute(sql);
+	}
+	
+	public void insertUpdateInfo(String g, String updateInfo)
+			throws Exception {
+			String sql = "INSERT INTO ReadParamReKey(GParam, ReKeyInfo) VALUES" +
+					"('" + g + "','" + updateInfo + "')";
+			con.createStatement().execute(sql);		
+	}
 }

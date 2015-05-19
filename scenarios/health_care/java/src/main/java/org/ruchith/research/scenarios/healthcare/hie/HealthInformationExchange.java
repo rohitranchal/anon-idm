@@ -18,7 +18,6 @@ import org.codehaus.jackson.node.ObjectNode;
 import org.ruchith.ae.base.AECipherTextBlock;
 import org.ruchith.ae.base.AEParameters;
 import org.ruchith.ae.base.Encrypt;
-
 import org.ruchith.research.scenarios.healthcare.Util;
 
 /**
@@ -103,5 +102,15 @@ public class HealthInformationExchange extends ServiceProvider {
 		CertificateFactory factory = CertificateFactory.getInstance("X.509");
 		Certificate cert = factory.generateCertificate(new ByteArrayInputStream(recvCert.getBytes()));
 		return Util.verifyB64Sig(content, cert, recvSig);
+	}
+	
+	public void insertUpdateInfo(String g, String updateInfo) 
+		throws Exception {
+		db.insertUpdateInfo(g, updateInfo);
+	}
+	
+	public void updatePublicParam(String g, String param) 
+		throws Exception {
+		db.updatePublicParam(g, param);
 	}
 }
