@@ -89,6 +89,21 @@ public class ClaimWallet {
 		*/
 		FileUtils.writeStringToFile(new File(claimFilePath), claim.serializeJSON());
 	}
+	
+	public void updateClaim(IdentityClaim claim) throws Exception {
+		String name = claim.getDefinition().getName();
+		
+		// delete the previous file
+		IdentityClaim prevClaim = claims.get(name);
+		String prevFilename = prevClaim.getDefinition().getB64Hash().replace(File.separator, "").replace("\\", "").replace("=", "")
+				.replace("+", "");
+		String prevClaimFilePath = this.walletDir.getAbsolutePath() + File.separator + prevFilename;
+		FileUtils.forceDelete(new File(prevClaimFilePath));
+		
+		// Store it again, and memeory state update as well
+		storeClaim(claim);
+		this.claims.put(name, claim);
+	}
 
 	/**
 	 * Return the number of claims in the wallet

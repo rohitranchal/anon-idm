@@ -2,6 +2,11 @@ package org.ruchith.research.idm.user;
 
 import it.unisa.dia.gas.jpbc.Element;
 
+import java.io.ByteArrayInputStream;
+import java.security.MessageDigest;
+import java.security.Signature;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -10,7 +15,9 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.bouncycastle.util.encoders.Base64;
+import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.ObjectNode;
 import org.ruchith.ae.base.AECipherTextBlock;
 import org.ruchith.ae.base.AEParameters;
@@ -38,8 +45,84 @@ public class Client {
 		return res;
 	}
 	
-	public String getClaimdef(String claimDefName) {
-		return wallet.getClaim(claimDefName).getDefinition().serializeJSON().toString();
+	public String getPublicParams(String claimDefName) throws Exception {
+		String claimdef = wallet.getClaim(claimDefName).getDefinition().serializeJSON().toString();
+		
+		ObjectMapper mapper = new ObjectMapper();
+		JsonNode root_node = mapper.readTree(claimdef);
+		String params = root_node.get("params").toString();
+		System.out.println("params: " + params);
+		return params;
+	}
+	
+	public String getRandomIDclaim(String claimDefName) {
+		byte[] tmp = wallet.getClaim(claimDefName).getClaimKey().toBytes();
+		String result = new String(Base64.encode(tmp));
+		System.out.println("test: " + result);
+		return result;
+	}
+	
+	public void updateClaim(String claimDefName, String param, String c, String dgstStr, String sigStr, String certStr) throws Exception {
+		IdentityClaim tmpClaim = wallet.getClaim(claimDefName);
+		
+		// ClaimDefinition creation
+		CertificateFactory factory = CertificateFactory.getInstance("X.509");
+		Certificate tmpCert = factory.generateCertificate(new ByteArrayInputStream(Base64.decode(certStr)));
+		
+		MessageDigest dgst = MessageDigest.getInstance("SHA-512");
+		Signature sig = Signature.getInstance("SHA512withRSA");
+		
+		ObjectMapper mapper = new ObjectMapper();
+		ObjectNode on = (ObjectNode) mapper.readTree(param);
+		AEParameters aeParams = new AEParameters(on);
+		
+		IdentityClaimDefinition tmpDef = new IdentityClaimDefinition(claimDefName, aeParams);
+		
+		// Verify dgst
+		byte[] contentBytes = tmpDef.getDgstContet().getBytes();
+		
+		dgst.reset();
+		dgst.update(contentBytes);
+		String newDgstVal = new String(Base64.encode(dgst.digest()));
+		
+		if (!newDgstVal.equals(dgstStr)) {
+			System.out.println("Hash doesn't match!");
+			return;
+		}
+		else {
+			System.out.println("Hash matches!");
+		}
+		
+		// Verify signature
+		sig.initVerify(tmpCert);
+		sig.update(contentBytes);
+		if (!sig.verify(Base64.decode(sigStr))) {
+			System.out.println("Incorrect Signature!");
+			return;
+		}
+		else {
+			System.out.println("Correct Signature!");
+		}
+		
+		tmpDef.setB64Hash(dgstStr);
+		tmpDef.setB64Sig(sigStr);
+		
+		tmpDef.setCert(tmpCert);		
+		
+		// New ClaimDefinition set
+		IdentityClaim newClaim = new IdentityClaim();
+		newClaim.init(tmpDef);
+		
+		// updated key
+		AEPrivateKey newAEClaim = tmpClaim.getClaim();
+		Element tmpElem = aeParams.getPairing().getG1().newElement();
+		tmpElem.setFromBytes(Base64.decode(c));
+		newAEClaim.setC1(tmpElem.getImmutable());
+		newClaim.setClaim(newAEClaim);
+		
+		newClaim.setClaimKey(tmpClaim.getClaimKey());
+		
+		wallet.updateClaim(newClaim);
 	}
 
 	public String generateRequest(String claimName) throws Exception {
