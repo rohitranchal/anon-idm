@@ -114,25 +114,166 @@ var get_doctor_claimdef_list = function() {
     });
 };
 
+exports.check_access = function(req, res) {
+    console.log("check_access is called");
+
+    var claim_read_name = req.query.read_name;
+    console.log("In check_access: " + claim_read_name);
+
+    var g_var;
+    // All will be encoded format
+    var recv_param, my_param;
+
+    extract_g_from_claim_name(claim_read_name)
+    .then(function(g) {
+        g_var = g;
+        console.log("G value extracted: " + g);
+        return request_promise('get', 'http://' + common.hie_address + '/get_read_param?g=' + encodeURIComponent(g_var));
+    })
+    .then(function(param) {
+        recv_param = param.body;
+        console.log("Received Param is as follows:");
+        console.log(recv_param);
+        return get_public_params(claim_read_name);
+        // compare my claim 
+        // if yes return yes
+        // if no try to update its claim
+    })
+    .then(function(param) {
+        // Returned param is in plain text format. Therefore, encode it
+        my_param = new Buffer(param).toString('base64');
+        console.log("Local Param is as follows:");
+        console.log(my_param);
+
+        // compare my param and received param
+        if(my_param == recv_param) {
+            console.log("Has access: Received Param and Local Param are equal");
+            Promise.resolve(true);
+        }
+        else {
+            console.log("Need action");
+            var update_info_decoded_json;
+            // fetch parameter from hie
+            return request_promise('get', 'http://' + common.hie_address + '/get_update_info?g=' + encodeURIComponent(g_var))
+                .then(function(result) {
+                    console.log("Update info received: ");
+                    var update_info_encoded = result.body;
+                    var update_info_decoded = new Buffer(update_info_encoded, 'base64').toString();
+                    console.log(update_info_decoded);
+
+                    // 01. find beta
+                    update_info_decoded_json = JSON.parse(update_info_decoded);
+                    console.log("beta: " + update_info_decoded_json.beta);
+                    var param = JSON.stringify(update_info_decoded_json.params);
+                    // 02. do calculation
+                    return calculate_lookup_value(claim_read_name, param, update_info_decoded_json.beta);
+                })
+                .then(function(lookup) {
+                    console.log("calculated new req^beta: " + lookup);
+
+                    // 03. iterate and compare
+                    var array = update_info_decoded_json.updateArray;
+                    console.log("updateArray: ");
+                    console.log(array);
+
+                    var found = false;
+                    var new_c0 = null;
+                    for (var item in array) {
+                        if(array[item].req == lookup) {
+                            found = true;
+                            console.log(array[item].req);
+                            console.log(array[item].c0);
+                            new_c0 = array[item].c0;
+                            break;
+                        }
+                    }
+
+                    console.log("TEST: " + found);
+
+                    // 04. if found yes! if not found uh oh..
+                    if(found) {
+                        var param = JSON.stringify(update_info_decoded_json.params);
+                        console.log(param);
+                        var dgstStr = update_info_decoded_json.dgst;
+                        var sigStr = update_info_decoded_json.sig;
+                        var certStr = update_info_decoded_json.cert;
+
+                        console.log("param update happens!");
+                        return update_claim(claim_read_name, param, new_c0, dgstStr, sigStr, certStr)
+                    }
+                    else {
+                        // false
+                        return Promise.reject("Update item is not found");
+                    }
+                })
+                .then(function(result) {
+                    return Promise.resolve("Proceed to authenticate");
+                });
+        }
+    })
+    .then(function(success) {
+        res.send(success);
+    }, function(failure) {
+        res.send("Failed: " + failure);
+    });
+};
+
+var get_public_params = function(name) {
+    return new Promise(function(resolve, reject) {
+        common.doctor.getPublicParams(name, function(err, res) {
+            if(err) reject(err);
+            else resolve(res);
+        });
+    });
+};
+
+var calculate_lookup_value = function(claimDefName, param, betaString) {
+    return new Promise(function(resolve, reject) {
+        common.doctor.calculateLookupValue(claimDefName, param, betaString, function(err, res) {
+            if(err) reject(err);
+            else resolve(res);
+        });
+    });
+};
+
+
+var update_claim = function(claimDefName, param, c, dgstStr, sigStr, certStr) {
+    return new Promise(function(resolve, reject) {
+        common.doctor.updateClaim(claimDefName, param, c, dgstStr, sigStr, certStr, function(err, res) {
+            if(err) reject(err);
+            else resolve(res);
+        });
+    });
+};
+
 exports.authenticate_hie = function(req, res) {
     var claimdefname = req.body.selection;
     console.log("[Claim chosen  ]: " + claimdefname);
 
-    var queue = [];
-    queue.push(generate_request(claimdefname));
-    queue.push(extract_g_from_claim_name(claimdefname));
-
     // declaration of the variables used in the promise chains
     var g_extracted, cookie_id, session_key_extracted; 
 
-    common.promise.all(queue)
+    request_promise('get', 'http://' + common.self_domain + ":" + req.app.this_http_port + "/check_access?read_name=" + claimdefname)
+    .then(function(result) {
+        console.log(result.body);
+        if(result.body.indexOf("Failed") >= 0) {
+            return Promise.reject(result.body);
+        }
+        else {
+            var queue = [];
+            queue.push(generate_request(claimdefname));
+            queue.push(extract_g_from_claim_name(claimdefname));
+
+            return common.promise.all(queue);
+        }
+    })
     .then(function(result) {
         var request_generated = result[0];
         g_extracted = result[1];
 
         console.log("[Request generated     ]: " + request_generated);
         console.log("[g extracted           ]: " + g_extracted);
-        return request_promise('post', 'http://localhost:3004/authenticate',
+        return request_promise('post', 'http://' + common.hie_address +'/authenticate',
             {form: {request:request_generated, g:g_extracted}});
     })
     .then(function(result) {
@@ -174,40 +315,45 @@ exports.authenticate_hie = function(req, res) {
         console.log("sig: " + created_sig);
 
         var doctor_cert = fs.readFileSync(common.keystore_dir + "/" + common.certname, 'utf8').trim();
+        console.log("cert: " + doctor_cert);
 
         // request for validity of hash
         // if correct, session generation
         // otherwise, don't create session management
 
-        return request_promise('post', 'http://localhost:3004/check_hash_validity',
+        return request_promise('post', 'http://' + common.hie_address + '/check_hash_validity',
             {form: {g:g_extracted, dgst: created_dgst, sig: created_sig, cert: doctor_cert}},
             cookie_id);
     })
     .then(function (result) {
-        // When failed?
-        //console.log(result);
-        //console.log(result.response);
-        //console.log(result.body);
-
-
-        // TODO when failed
-
-
-        req.session.regenerate(function() {
-            req.session.hie_cookie = cookie_id;
-            req.session.current_def = claimdefname;
-            req.session.key = session_key_extracted;
-            console.log("[[Session] cookie for hie acess is inserted into session]: " + cookie_id);
-            // TODO when to?
+        // response contains failure message
+        if(result.body.indexOf('Failed') >= 0) {
             res.render("response_result", 
                 { 
                     redirect_url: 'http://' + common.self_domain + ":" + req.app.this_http_port , 
                     result_msg: result.body
                 });
-        });
-
+        }
+        else {
+            req.session.regenerate(function() {
+                req.session.hie_cookie = cookie_id;
+                req.session.current_def = claimdefname;
+                req.session.key = session_key_extracted;
+                console.log("[[Session] cookie for hie acess is inserted into session]: " + cookie_id);
+                res.render("response_result", 
+                    { 
+                        redirect_url: 'http://' + common.self_domain + ":" + req.app.this_http_port , 
+                        result_msg: result.body
+                    });
+            });
+        }
     }, function(err) {
         console.log(err);
+        res.render("response_result", 
+            { 
+                redirect_url: 'http://' + common.self_domain + ":" + req.app.this_http_port , 
+                result_msg: err
+            });
     });
 };
 
@@ -271,7 +417,7 @@ exports.logout = function(req, res) {
     }
     else {
         console.log("[logout with the cookie    ]: " + req.session.hie_cookie);
-        request_promise('get', 'http://localhost:3004/logout', null, req.session.hie_cookie)
+        request_promise('get', 'http://' + common.hie_address + '/logout', null, req.session.hie_cookie)
         .then(function(result) {
             console.log("[Response from HIE ]: " + result.body);
             // TODO a little bit more case..
@@ -300,7 +446,7 @@ exports.get_data = function(req, res) {
     }
     else {
         console.log("Halo?");
-        request_promise('get', 'http://localhost:3004/get_result', null, req.session.hie_cookie)
+        request_promise('get', 'http://' + common.hie_address + '/get_result', null, req.session.hie_cookie)
         .then(function(result) {
             console.log("response from get_result");
             console.log(result.body);

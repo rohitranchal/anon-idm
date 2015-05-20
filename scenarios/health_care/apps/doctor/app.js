@@ -9,39 +9,34 @@ var session = require('express-session');
 var routes = require('./routes');
 
 var app = express();
-// TODO finish this part
 if(process.argv.length == 2) {
     app.listen(3002, function() {
-        app.locals.http_port = 3002;
         app.this_http_port = 3002;
         console.log("doctor's app is listening to port 3002");
     });
 }
 else if(process.argv.length == 3) {
-    // TODO maybe setting app.locals.http_port might be needed
-    // or app.this_http_port
     var target_http_port = parseInt(process.argv[2]);
     //var target_https_port = parseInt(process.argv[3]);
     app.this_http_port = target_http_port;
     console.log("HTTP Port : " + target_http_port);
     //console.log("HTTPS Port: " + target_https_port);
 
-/*
-npm install --save secure-random // version 1.1.1
-var bytes = secureRandom(10) //return an Array of 10 bytes 
-console.log(bytes.length) //10 
-*/
+    /*
+    npm install --save secure-random // version 1.1.1
+    var bytes = secureRandom(10) //return an Array of 10 bytes 
+    console.log(bytes.length) //10 
+    */
 
-/*
-var express = require('express');
-var https = require('https');
-var http = require('http');
-var app = express();
+    /*
+    var express = require('express');
+    var https = require('https');
+    var http = require('http');
+    var app = express();
 
-http.createServer(app).listen(80);
-https.createServer(options, app).listen(443);
-*/
-
+    http.createServer(app).listen(80);
+    https.createServer(options, app).listen(443);
+    */
 
     app.listen(target_http_port, function() {
         console.log("doctor's app is listening to port " + target_http_port);
@@ -98,6 +93,7 @@ app.post('/req_permission', routes.req_permission);
 // handling issuing claims
 app.post('/update_permission', routes.update_permission);
 
+app.get('/check_access', routes.check_access);
 app.get('/authenticate_hie_page', routes.authenticate_hie_page);
 app.post('/authenticate_hie', routes.authenticate_hie);
 app.get('/logout', routes.logout);

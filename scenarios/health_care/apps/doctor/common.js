@@ -58,3 +58,4 @@ exports.keystore_pass = 'bobkey';
 exports.alias = 'bob';
 exports.privatekey_pass = 'bobkey';
 exports.self_domain = 'localhost';
+exports.hie_address = 'localhost:3004';
