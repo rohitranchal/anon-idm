@@ -48,6 +48,7 @@ CREATE TABLE RequestPermission (
     Type TINYINT UNSIGNED NOT NULL,
     Registered BOOLEAN NOT NULL DEFAULT FALSE,
     ReqSrcUrl VARCHAR(256) NOT NULL,
+    Revocated BOOLEAN NOT NULL DEFAULT FALSE,
     PRIMARY KEY(RecordId, Name)
 );
 
@@ -86,3 +87,9 @@ CREATE TABLE HieRecord (
     Record TEXT NOT NULL                # Medical Result
 );
 
+DROP TABLE IF EXISTS ReadParamReKey;
+CREATE TABLE ReadParamReKey (
+	id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	GParam VARCHAR(512) NOT NULL,
+	ReKeyInfo TEXT NOT NULL
+);
