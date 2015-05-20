@@ -57,6 +57,36 @@ exports.list_hie_record = function(req, res) {
     res.send("temp response from list_hie_record");
 };
 
+exports.get_read_param = function(req, res) {
+    console.log("get_read_param is called");
+
+    var user_g = decodeURIComponent(req.query.g);
+    console.log("g is received: " + user_g);
+    db.get_read_param_by_g(user_g)
+    .then(function(result) {
+        console.log(result);
+        res.send(result.ParamRead);
+    }, function(error) {
+        res.send('Error:' + error);
+    });
+};
+
+exports.get_update_info = function(req, res) {
+    console.log("get_update_info is called");
+
+    var user_g = decodeURIComponent(req.query.g);
+    db.get_latest_rekey_by_g(user_g)
+    .then(function(result) {
+        console.log(result);
+        res.send(result.ReKeyInfo);
+    },
+    function(err) {
+        console.log(err);
+    });
+    // then update read params 
+    // It has separate datastructure for ReKey
+};
+
 // authenticate for the record corresponds to param g
 exports.authenticate = function(req, res) {
     var user_req = req.body.request;
@@ -91,7 +121,12 @@ exports.authenticate = function(req, res) {
             res.send(result_json.Anonymous);
         });
     }, function(error) {
-        // TODO if already session is created, destroy
+        // if already session is created, destroy it
+        if(req.session.g != undefined) {
+            req.session.destroy(function() {
+                console.log("[Session needs to be destroyed!]");
+            });
+        }
         console.log("[authenticate error    ]: " + error);
         res.send("Error in authenticate");
     });
@@ -128,8 +163,11 @@ exports.check_hash_validity = function(req, res) {
     .then(function(is_valid_dgst) {
         console.log("is valid dgst: " + is_valid_dgst);
         if(!is_valid_dgst) {
-            // TODO: destory session
-            res.send("Failed");
+            // destory session
+            req.session.destroy(function() {
+                console.log("Session destroyed: invalid dgst!");
+            });
+            return Promise.reject("Failed in verifying dgst");
         }
         else {
            return verify_session_sig(curr_key, recv_cert, recv_sig);
@@ -138,15 +176,17 @@ exports.check_hash_validity = function(req, res) {
     .then(function(is_valid_sig) {
         console.log("is valid sig: " + is_valid_sig);
         if(!is_valid_sig) {
-            // TODO: destroy session
-            res.send("Failed");
+            req.session.destroy(function() {
+                console.log("Session destroyed: invalid sig!");
+            });
+            return Promise.reject("Failed in verifying sig");
         }
         else {
             res.send("Authenticated");
         }
     }, function(err) {
-        console.log("Helloooooooo!");
-        res.send("Error in checking validity\n" + err);
+        console.log("Hello");
+        res.send(err);
     });
 
 
@@ -222,6 +262,61 @@ exports.logout = function(req, res) {
             res.send("Success in logout");
         });
     }
+};
+
+exports.update_read_info = function(req, res) {
+    console.log("update_read_info is called");
+
+    var update_info_encoded = req.body.update_info;
+    console.log("update info received: " + update_info_encoded);
+
+    var update_info_decoded = new Buffer(update_info_encoded, 'base64').toString();
+    var update_info_json = JSON.parse(update_info_decoded);
+    var params = update_info_json.params;
+    var params_encoded = new Buffer(JSON.stringify(params)).toString('base64');
+    var g_param = params.g;
+
+    /*
+    console.log("update_info_json:");
+    console.log(update_info_json);
+    console.log("params:");
+    console.log(params);
+    console.log("params_encoded:");
+    console.log(params_encoded);
+    */
+
+    update_public_param(g_param, params_encoded)
+    .then(function(result) {
+        console.log("update_public_param is done");
+        return insert_update_info(g_param, update_info_encoded);
+    })
+    .then(function(result) {
+        console.log("insert_update_info is done");
+        res.send("Success");
+    }, function(err) {
+        console.log(err);
+        res.send("Fail: " + err);
+    });
+};
+
+var update_public_param = function(g_param, params_encoded) {
+    return new Promise(function(resolve, reject) {
+        common.hie.updatePublicParam(g_param, params_encoded, 
+            function(err, res) {
+                if(err) reject(err);
+                else resolve(res);
+            });
+    });
+}; 
+
+var insert_update_info = function(g_param, update_info_encoded) {
+    return new Promise(function(resolve, reject) {
+        common.hie.insertUpdateInfo(g_param, update_info_encoded, 
+            function(err, res) {
+                if(err) reject(err);
+                else resolve(res);
+            });
+    });
 };
 
 exports.operation = function(req, res) {

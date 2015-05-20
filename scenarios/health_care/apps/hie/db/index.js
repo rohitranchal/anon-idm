@@ -36,6 +36,29 @@ exports.get_result_by_g = function(g_param) {
             });
     });
 };
+
+exports.get_all_col_by_g = function(g_param) {
+    return new Promise(function(resolve, reject) {
+        connection.query("SELECT * FROM HieRecord WHERE GParam='" + g_param + "'",
+            function(error, rows, fields) {
+                if(error) reject(error);
+                else resolve(rows);
+            });
+    });
+};
+
+exports.get_latest_rekey_by_g = function(g_param) {
+    return new Promise(function(resolve, reject) {
+        connection.query("SELECT ReKeyInfo FROM ReadParamReKey WHERE GParam='" + g_param + "'" + 
+            " ORDER BY id DESC",
+            function(error, rows, fields) {
+                if(error) reject(error);
+                else resolve(rows[0]);
+            });
+    });
+};
+
+
 /*
 exports.get_all_lab_records = function() {
     return new Promise(function(resolve, reject) {
