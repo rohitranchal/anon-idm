@@ -37,11 +37,17 @@ exports.register_record_page = function(req, res) {
 exports.register_record = function(req, res) {
     console.log('register_record is called');
     var presc_id = req.body.record_id;
+    var owner_url = req.body.owner_url;
     console.log('record id: ' + presc_id); 
+    console.log('owner url: ' + owner_url);
+    
+    console.log('self: ' + common.self_domain);
+    console.log('port:' + req.app.this_http_port);
 
     // TODO SELF 
-    request('get', 'http://localhost:3003/get_parameters/' + presc_id)
+    request('get', 'http://' + common.self_domain + ':' + req.app.this_http_port + '/get_parameters?record_id=' + presc_id + "&owner_url=" + owner_url)
     .then(function(result) {
+        console.log(result.body);
         var params = JSON.parse(result.body);
         console.log("Owner: " + params.owner);
         console.log("Read: " + params.read);
@@ -49,7 +55,7 @@ exports.register_record = function(req, res) {
     })
     .then(function(result) {
         console.log("success in register_record!");
-        res.render('response_result', { redirect_url: "http://localhost:3003", result_msg: "Updated!"});
+        res.render('response_result', { redirect_url: 'http://' + common.self_domain + ":" + req.app.this_http_port, result_msg: "Updated!"});
     }, function(error) {
         console.log("Error in register_record: " + error);
     });
@@ -81,7 +87,10 @@ exports.update_record = function(req, res) {
 
     update_record_info(req.body.selection, req.body.record_content)
     .then(function(result) {
-        res.render('response_result', { redirect_url: 'http://localhost:3003/' , result_msg: "update record success!"});
+        res.render('response_result', 
+            { redirect_url: 'http://' + common.self_domain + ":" + req.app.this_http_port  ,
+              result_msg: "update record success!"
+            });
     },
     function(error) {
         console.log(error);
@@ -119,13 +128,16 @@ exports.send_record = function(req, res) {
 
         console.log(result);
         // TODO send post request to the hie 
-        return request('post', 'http://localhost:3004/update_hie_record', 
+        return request('post', 'http://' + common.hie_address + '/update_hie_record', 
             {form: result});
     }).
     then(function(result) {
         console.log("here i am!");
         console.log("response from post call: " + result.body);
-        res.render('response_result', {redirect_url: 'http://localhost:3003/' , result_msg: "send record success!"});
+        res.render('response_result', 
+            { redirect_url: 'http://' + common.self_domain + ":" + req.app.this_http_port, 
+              result_msg: "send record success!"
+            });
     }, function(error) {
         console.log(error);
     });
@@ -138,9 +150,16 @@ exports.get_parameters = function(req, res) {
     var OwnerName = null;
     var ReadName = null;
 
+    var record_id = req.query.record_id;
+    var owner_url = req.query.owner_url;
+
+    console.log("target parameter: " + record_id);
+    console.log("owner_url: " + owner_url);
+
     // 1. First, get names of claimdefs for the corresponding record id
-    request('get', 'http://localhost:3001/param_names/' + req.params.id)
+    request('get', owner_url + '/param_names/' + record_id)
     .then(function(result) {
+
         param_names = JSON.parse(result.body)[0];
         OwnerName = param_names.OwnerName;
         ReadName = param_names.ReadName;
@@ -149,8 +168,8 @@ exports.get_parameters = function(req, res) {
 
         // 2. Second, with this name, fetch claim defs and extract public defs
         var queue = [];
-        queue.push(get_claim_and_extract_public_params(OwnerName));
-        queue.push(get_claim_and_extract_public_params(ReadName));
+        queue.push(get_claim_and_extract_public_params(OwnerName, owner_url));
+        queue.push(get_claim_and_extract_public_params(ReadName, owner_url));
         return common.promise.all(queue);
     })
     // 3. TODO
@@ -161,19 +180,20 @@ exports.get_parameters = function(req, res) {
         public_params = { "owner": result[0], "read": result[1] };
         res.send(public_params);
     }, function(error) {
-        console.log("Errors: " + error);
+        console.log("Errors in get_parameters: " + error);
+        console.log(error.stack);
     });
 };
 
-var get_claim_and_extract_public_params = function(name) {
+var get_claim_and_extract_public_params = function(name, owner_url) {
     var curr_claimdef;
     // fetch claimdef
-    return request('get', 'http://localhost:3001/claimdef/' + name)
+    return request('get', owner_url + '/claimdef/' + name)
         .then(function(result) {
             curr_claimdef = result.body;
             console.log(curr_claimdef);
             // fetch cert
-            return request('get', 'http://localhost:3001/cert/');
+            return request('get', owner_url + '/cert/');
         })
         .then(function(result) {
             var fetched_cert = result.body;

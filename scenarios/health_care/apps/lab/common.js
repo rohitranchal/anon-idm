@@ -33,3 +33,6 @@ var promise = require('promise');
 exports.lab = lab;
 exports.java = java;
 exports.promise = promise;
+
+exports.self_domain = 'localhost';
+exports.hie_address = 'localhost:3004';

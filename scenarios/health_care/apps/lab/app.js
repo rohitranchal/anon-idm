@@ -10,9 +10,21 @@ var routes = require('./routes');
 var users = require('./routes/user');
 
 var app = express();
-app.listen(3003, function() {
-    console.log("Patient's app is listening to port 3003");
-});
+if(process.argv.length == 2) {
+    app.listen(3003, function() {
+        app.this_http_port = 3003;
+        console.log("Lab's app is listening to port 3003");
+    });
+}
+else if(process.argv.length == 3) {
+    var target_http_port = parseInt(process.argv[2]);
+    app.this_http_port = target_http_port;
+    console.log("HTTP Port : " + target_http_port);
+
+    app.listen(target_http_port, function() {
+        console.log("Lab's app is listening to port " + target_http_port);
+    });
+}
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -40,7 +52,7 @@ app.post('/send_record', routes.send_record);
 app.get('/list_record');
 */
 
-app.get('/get_parameters/:id', routes.get_parameters);
+app.get('/get_parameters', routes.get_parameters);
 
 /// catch 404 and forwarding to error handler
 app.use(function(req, res, next) {
