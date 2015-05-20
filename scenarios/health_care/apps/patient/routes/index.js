@@ -259,7 +259,7 @@ exports.revocate_user = function(req, res) {
 
     var name_and_record_id = req.body.selection.split("_");
 
-    var name = name_and_record_id[0];
+    var username = name_and_record_id[0];
     var record_id = name_and_record_id[1];
 
     var read_claim_name = record_id + "_read";
@@ -267,19 +267,42 @@ exports.revocate_user = function(req, res) {
     var prev_param, new_param;
     
     db.get_claimdef_by_name(read_claim_name, function(val) {
-        new_param = val.params;
-        retrieve_revocate_info(val.name, val.params)
-        .then(function(val) {
+        prev_param = val.params;
+        // new Buffer(prev_param, 'base64').toString();
+
+        // TODO offer name -- dropping the real param
+        retrieve_revocate_info(val.name, username, prev_param)
+        .then(function(update_val) {
+            // TODO request update in hie service
+            console.log("Update value to be sent");
+            console.log(update_val);
+            return promise_request('post', 'http://' + common.hie_address + '/update_read_info',
+                    {form: {
+                        update_info: update_val
+                    }});
+        })
+        .then(function(result) {
+            console.log("Updating read param info in hie is done");
+            var msg = result.body;
+            console.log(msg);
+            res.render('response_result', 
+                { redirect_url: 'http://' + common.self_domain + ':' + req.app.this_http_port, 
+                  result_msg: msg 
+                });
         }, function(err) {
             console.log("errors:" + err);
+            res.render('response_result', 
+                { redirect_url: 'http://' + common.self_domain + ":" + req.app.this_http_port, 
+                  result_msg: "Fail: " + err
+                });
         });
     });
 };
 
 
-var retrieve_revocate_info = function(name, params) {
+var retrieve_revocate_info = function(read_claim_name, user_name, params) {
     return new Promise(function(resolve, reject) {
-        common.idm.retrieveRevocateInfo(name, params, function(err, res) {
+        common.idm.processRevocation(read_claim_name, user_name, params, function(err, res) {
             if(err) reject(err);
             else resolve(res);
         });
@@ -338,9 +361,4 @@ exports.param_names = function(req, res) {
     db.get_param_names_by_record_id(req.params.id, function(val) {
         res.send(val);
     });
-};
-
-exports.test = function(req, res) {
-    console.log(req);
-    res.redirect('/claimdef/' + req.query.id);
 };

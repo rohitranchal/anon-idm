@@ -40,3 +40,4 @@ exports.config_dir = config_dir;
 exports.promise = promise;
 
 exports.self_domain = 'localhost';
+exports.hie_address = 'localhost:3004';
