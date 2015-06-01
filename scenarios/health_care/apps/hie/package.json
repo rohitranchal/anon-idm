@@ -17,6 +17,7 @@
     "mysql":"^2.5.5",
     "request": "2.53.0",
     "promise": "*",
-    "express-session": "~1.10.4"
+    "express-session": "~1.10.4",
+    "connect-redis": "*"
   }
 }
