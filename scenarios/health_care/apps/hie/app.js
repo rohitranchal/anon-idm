@@ -1,17 +1,26 @@
 // Include the cluster module
 var cluster = require('cluster');
 
+// master process
 if(cluster.isMaster) {
     // Count the machine's CPUs
-    var cpuCount = require('os').cpus().length;
+    var cpuCount;
+    if(process.argv.length <= 3) {
+        cpuCount = require('os').cpus().length - 2;
+    }
+    else if( process.argv.length == 4) {
+        cpuCount = parseInt(process.argv[3]);
+    }
+
+    console.log("CPU Count: " + cpuCount);
 
     // Create a worker for each CPU
     for (var i = 0; i < cpuCount; i += 1) {
         cluster.fork();
     }
 }
+// child process
 else {
-
     var express = require('express');
     var http = require('http');
     var path = require('path');
@@ -23,8 +32,6 @@ else {
     
     var routes = require('./routes');
     
-    
-    
     var app = express();
     if(process.argv.length == 2) {
         app.listen(3004, function() {
@@ -33,6 +40,15 @@ else {
         });
     }
     else if(process.argv.length == 3) {
+        var target_http_port = parseInt(process.argv[2]);
+        app.this_http_port = target_http_port;
+        console.log("HTTP Port : " + target_http_port);
+    
+        app.listen(target_http_port, function() {
+            console.log("HIE's app is listening to port " + target_http_port);
+        });
+    }
+    else if(process.argv.length == 4){
         var target_http_port = parseInt(process.argv[2]);
         app.this_http_port = target_http_port;
         console.log("HTTP Port : " + target_http_port);
